@@ -1,13 +1,203 @@
+
 <!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Just+Another+Hand&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Onest:wght@100..900&display=swap" rel="stylesheet">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>host</title>
+    <title>CoDecipher Host</title>
   </head>
-  <body>
-    <div id="app"></div>
+
+  <body class="bg-[#F3EDDB] m-0 overflow-x-hidden">
+
+    <div id="app" class="w-full min-h-screen">
+
+      <!-- TOP AREA -->
+      <div id="top-area" class="relative w-full h-[37vh]">
+
+        <div id="title" class="absolute top-[70px] right-[50px]">
+          <img
+            id="codebox-title-icon"
+            src="src/assets/icons/codebox title.png"
+            alt="CoDecipher"
+            class="w-[700px] h-auto"
+          >
+        </div>
+
+        <div
+          id="exit"
+          class="absolute top-[20px] left-[20px] flex items-center gap-2"
+        >
+          <img
+            id="exit-icon"
+            src="src/assets/icons/exit icon.svg"
+            alt=""
+            class="w-10 h-10"
+          >
+
+          <button
+            id="exit-button"
+            class="bg-transparent font-['Just_Another_Hand'] text-[#8A2326] text-[40px] border-0 cursor-pointer p-0"
+          >
+            Exit Game
+          </button>
+        </div>
+
+      </div>
+
+
+      <!-- GAME MODES -->
+      <div id="gamemodes" class="relative w-full h-[70vh] min-h-[430px]">
+
+        <div
+          id="folder-container"
+          class="absolute inset-0 w-full h-full"
+        >
+
+          <!-- BOX BACKGROUND -->
+          <div id="bg" class="absolute bottom-7 left-0 w-full h-[550px] z-0">
+            <img
+              id="box-bg"
+              src="src/assets/images/box bg.png"
+              alt=""
+              class="w-full h-full object-fill"
+            >
+          </div>
+
+          <div id="folder-clip" class="relative overflow-hidden w-full h-[800px] top-[-100px]">
+            
+            <!-- TRIVIA -->
+            <div
+              id="card-trv"
+              class="gamemode-card folder-card folder-trv"
+            >
+              <img
+                id="trv"
+                src="src/assets/images/trv.png"
+                alt="Trivia"
+                class="w-full h-full object-contain"
+              >
+            </div>
+
+
+            <!-- IMPOSTOR -->
+            <div
+              id="card-impstr"
+              class="gamemode-card folder-card folder-impstr"
+            >
+              <img
+                id="impstr"
+                src="src/assets/images/impstr.png"
+                alt="Impostor"
+                class="w-full h-full object-contain"
+              >
+            </div>
+
+
+            <!-- SQL DETECTIVE -->
+            <div
+              id="card-sqldtctv"
+              class="gamemode-card folder-card folder-sqldtctv"
+            >
+              <img
+                id="sqldtctv"
+                src="src/assets/images/sqldtctv.png"
+                alt="SQL Detective"
+                class="w-full h-full object-contain"
+              >
+            </div>
+
+
+            <!-- ALT+C4 -->
+            <div
+              id="card-altc4"
+              class="gamemode-card folder-card folder-altc4"
+            >
+              <img
+                id="altc4-unselected"
+                src="src/assets/images/alt+c4 - unselected.png"
+                alt="Alt+C4"
+                class="absolute inset-0 w-full h-full object-contain"
+              >
+
+              <img
+                id="altc4-selected"
+                src="src/assets/images/alt+c4 - selected.png"
+                alt="Alt+C4 Information"
+                class="absolute inset-0 w-full h-full object-contain hidden"
+              >
+            </div>
+
+
+            <!-- CODEBLOCK -->
+            <div
+              id="card-cdblck"
+              class="gamemode-card folder-card folder-cdblck"
+            >
+              <img
+                id="cdblck-unselected"
+                src="src/assets/images/codeblock - unselected.png"
+                alt="CodeBlock"
+                class="absolute inset-0 w-full h-full object-contain"
+              >
+
+              <img
+                id="cdblck-selected"
+                src="src/assets/images/codeblock - selected.png"
+                alt="CodeBlock Information"
+                class="absolute inset-0 w-full h-full object-contain hidden"
+              >
+            </div>
+
+
+            <!-- TYPEBYTE -->
+            <div
+              id="card-typbyt"
+              class="gamemode-card folder-card folder-typbyt"
+            >
+              <img
+                id="typbyt-unselected"
+                src="src/assets/images/typebyte - unselected.png"
+                alt="TypeByte"
+                class="absolute inset-0 w-full h-full object-contain"
+              >
+
+              <img
+                id="typbyt-selected"
+                src="src/assets/images/typebyte - selected.png"
+                alt="TypeByte Information"
+                class="absolute inset-0 w-full h-full object-contain hidden"
+              >
+            </div>
+          </div>
+
+
+          <!-- BOX FRAME -->
+          <div
+            id="box-container"
+            class="absolute -bottom-40 left-0 w-full h-[550px] z-20 pointer-events-none"
+          >
+            <img
+              id="box"
+              src="src/assets/images/box.png"
+              alt=""
+              class="w-full h-full object-fill"
+            >
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
     <script type="module" src="/src/main.js"></script>
+
   </body>
 </html>
