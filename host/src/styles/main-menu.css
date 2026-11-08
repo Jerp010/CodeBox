@@ -1,6 +1,7 @@
+
 @font-face {
-    font-family: 'Game Paused';
-    src: url('../assets/fonts/Game\ Paused\ DEMO.otf') format('opentype');
+  font-family: 'Game Paused';
+  src: url('../assets/fonts/Game Paused DEMO.otf') format('opentype');
 }
 
 .just-another-hand-regular {
@@ -9,7 +10,6 @@
   font-style: normal;
 }
 
-
 .onest-regular {
   font-family: "Onest", sans-serif;
   font-optical-sizing: auto;
@@ -17,13 +17,16 @@
   font-style: normal;
 }
 
+/* =========================================
+   FOLDER STACK
+========================================= */
 
-/* FOLDER STACK */
 .folder-card {
   position: absolute;
   width: min(1100px, 95vw);
   aspect-ratio: 932 / 836;
   left: 50%;
+  transition: translate 0.3s ease-in-out;
 }
 
 .folder-card img {
@@ -33,38 +36,336 @@
 }
 
 /* BACK TO FRONT */
+
 .folder-trv {
-  top: 25px;
-  transform: translateX(calc(-42% + 230px));
+  top: 230px;
+  transform: translateX(calc(-40% + 230px));
   z-index: 1;
 }
 
 .folder-impstr {
-  top: 70px;
-  transform: translateX(calc(-42% + 100px));
+  top: 280px;
+  transform: translateX(calc(-45% + 100px));
   z-index: 2;
 }
 
 .folder-sqldtctv {
-  top: 120px;
+  top: 330px;
   transform: translateX(calc(-50% + 50px));
   z-index: 3;
 }
 
 .folder-altc4 {
-  top: 185px;
+  top: 380px;
   transform: translateX(calc(-55% - 20px));
   z-index: 4;
 }
 
 .folder-cdblck {
-  top: 250px;
+  top: 430px;
   transform: translateX(calc(-60% - 85px));
   z-index: 5;
 }
 
 .folder-typbyt {
-  top: 320px;
+  top: 480px;
   transform: translateX(calc(-65% - 160px));
   z-index: 6;
+}
+
+/* SELECTED FOLDER */
+
+.folder-card.selected .folder-unselected {
+  display: none;
+}
+
+.folder-card.selected .folder-selected {
+  display: block;
+}
+
+.folder-card.selected {
+  translate: 0 -330px;
+}
+
+
+/* GAME BACKGROUND */
+#scene-background {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      ellipse at 12% 35%,
+      rgba(235, 235, 239, 0.12),
+      transparent 35%
+    ),
+    radial-gradient(
+      ellipse at 90% 8%,
+      rgba(252, 251, 251, 0.07),
+      transparent 30%
+    ),
+    #F3EDDB;
+}
+
+#ambient-code {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background-image:
+    linear-gradient(rgba(48, 51, 79, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(48, 51, 79, 0.025) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* SUBTLE GRAIN */
+#ambient-code::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.12;
+  pointer-events: none;
+  background-image:
+    repeating-radial-gradient(
+      circle at 20% 30%,
+      rgba(48, 51, 79, 0.2) 0,
+      transparent 1px,
+      transparent 3px
+    );
+}
+
+/* SYSTEM PANEL */
+
+.system-panel {
+  position: absolute;
+  top: 12%;
+  left: 7%;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  font-family: 'Game Paused', monospace;
+  font-size: 13px;
+  letter-spacing: 1px;
+}
+
+.system-title {
+  color: #8A2326;
+  font-size: 15px;
+  letter-spacing: 2px;
+  margin-bottom: 5px;
+}
+
+.system-status {
+  color: #555B9D;
+  font-size: 11px;
+}
+
+/* DINOSAUR COMPANION */
+.player-panel {
+  position: absolute;
+  top: 39%;
+  left: 7%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: max-content;
+  animation: player-idle 2.5s ease-in-out infinite;
+  transition:
+    left 0.55s cubic-bezier(0.2, 0.8, 0.2, 1),
+    top 0.55s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.pixel-dino {
+  width: 65px;
+  height: auto;
+  transition: transform 0.2s ease;
+}
+
+.player-dots {
+  color: #8A2326;
+  letter-spacing: 3px;
+  animation: dots-blink 1.5s steps(2, start) infinite;
+}
+
+@keyframes dino-bob {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 -4px; }
+}
+
+
+/* INTERFACE DETAILS */
+
+.ambient-bracket,
+.ambient-detail {
+  position: absolute;
+  font-family: 'Game Paused', monospace;
+  user-select: none;
+}
+
+.ambient-bracket {
+  color: #555B9D;
+  opacity: 0.25;
+  font-size: 32px;
+}
+
+.bracket-one {
+  top: 15%;
+  left: 43%;
+}
+
+.bracket-two {
+  top: 34%;
+  right: 9%;
+  color: #8A2326;
+  opacity: 0.2;
+}
+
+.ambient-detail {
+  color: #555B9D;
+  opacity: 0.28;
+  font-size: 13px;
+}
+
+.detail-one {
+  top: 25%;
+  left: 13%;
+}
+
+.detail-two {
+  bottom: 18%;
+  right: 13%;
+}
+
+/* PIXEL MARKERS */
+
+.pixel-crosshair {
+  position: absolute;
+  top: 22%;
+  left: 30%;
+  width: 8px;
+  height: 8px;
+  background: #8A2326;
+  opacity: 0.2;
+  transform: rotate(45deg);
+  animation: marker-pulse 3s ease-in-out infinite;
+}
+
+.crosshair-two {
+  top: 51%;
+  left: 48%;
+  width: 5px;
+  height: 5px;
+  background: #555B9D;
+  animation-delay: -1.5s;
+}
+
+/* INTERFACE LINE */
+
+.ambient-line {
+  position: absolute;
+  top: 28%;
+  left: 7%;
+  width: 85px;
+  height: 1px;
+  background: #555B9D;
+  opacity: 0.25;
+}
+
+/* ANIMATIONS */
+
+@keyframes player-idle {
+  0%, 100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -5px;
+  }
+}
+
+@keyframes dots-blink {
+  0%, 100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes marker-pulse {
+  0%, 100% {
+    opacity: 0.12;
+    scale: 1;
+  }
+  50% {
+    opacity: 0.4;
+    scale: 1.4;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .player-panel,
+  .player-dots,
+  .pixel-crosshair,
+  .symbol,
+  .pixel-star {
+    animation: none;
+  }
+}
+
+/* PROGRAMMING SYMBOLS */
+
+.symbol-cluster {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  font-family: 'Game Paused', monospace;
+}
+
+.symbol {
+  position: absolute;
+  color: #454A9C;
+  opacity: 0.23;
+  font-size: 30px;
+  animation: symbol-float 6s ease-in-out infinite;
+}
+
+.symbol-a { top: 16%; left: 43%; font-size: 36px; }
+.symbol-b { top: 32%; right: 8%; color: #8A2326; }
+.symbol-c { top: 52%; left: 31%; }
+.symbol-d { top: 70%; right: 13%; color: #8A2326; }
+.symbol-e { top: 25%; left: 13%; font-size: 20px; }
+.symbol-f { bottom: 15%; left: 40%; font-size: 17px; }
+.symbol-g { top: 12%; right: 36%; }
+.symbol-h { bottom: 25%; right: 28%; }
+.symbol-i { top: 57%; right: 7%; font-size: 20px; }
+.symbol-j { top: 43%; left: 18%; }
+.symbol-k { bottom: 12%; right: 43%; }
+.symbol-l { top: 75%; left: 19%; }
+
+@keyframes symbol-float {
+  0%, 100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -7px;
+  }
+}
+
+/* PIXEL STARS */
+
+.pixel-star {
+  position: absolute;
+  color: #8A2326;
+  opacity: 0.35;
+  font-size: 19px;
+  animation: star-twinkle 2.5s ease-in-out infinite;
+}
+
+.star-one { top: 21%; left: 31%; }
+.star-two { top: 46%; right: 24%; animation-delay: -1s; }
+.star-three { bottom: 20%; left: 12%; animation-delay: -1.7s; }
+
+@keyframes star-twinkle {
+  0%, 100% { opacity: 0.15; scale: 0.85; }
+  50% { opacity: 0.5; scale: 1.15; }
 }
