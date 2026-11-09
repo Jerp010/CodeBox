@@ -1,0 +1,287 @@
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Just+Another+Hand&display=swap"
+      rel="stylesheet"
+    >
+    <link
+      href="https://fonts.googleapis.com/css2?family=Onest:wght@100..900&display=swap"
+      rel="stylesheet"
+    >
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CoDecipher Host</title>
+  </head>
+
+  <body class="bg-[#F3EDDB] m-0 overflow-x-hidden">
+
+    <div id="app" class="relative isolate w-full min-h-screen">
+
+      <!-- AMBIENT GAME BACKGROUND -->
+      <div id="scene-background">
+
+        <div id="ambient-code">
+
+          <!-- PLAYER COMPANION -->
+          <div class="player-panel" id="dino-roamer">
+
+            <svg
+              class="pixel-dino"
+              viewBox="0 0 120 100"
+              xmlns="http://www.w3.org/2000/svg"
+              shape-rendering="crispEdges"
+            >
+              <!-- Body and head -->
+              <path
+                d="M15 45 H25 V35 H35 V25 H75 V30 H90 V40 H105 V55 H95 V65 H80 V72 H72 V88 H58 V75 H48 V88 H35 V72 H25 V62 H15 V55 H10 V48 H15 Z"
+                fill="#30334F"
+              />
+
+              <!-- Tail -->
+              <path
+                d="M15 45 H5 V55 H15 V62 H25 V52 H15 Z"
+                fill="#30334F"
+              />
+
+              <!-- Eye -->
+              <rect x="87" y="38" width="7" height="7" fill="#F3EDDB"/>
+
+              <!-- Tiny arm -->
+              <rect x="78" y="55" width="10" height="5" fill="#30334F"/>
+            </svg>
+
+            <span class="player-dots">•••</span>
+          </div>
+
+          <!-- PROGRAMMING SYMBOLS -->
+          <div class="symbol-cluster">
+            <span class="symbol symbol-a">&lt;/&gt;</span>
+            <span class="symbol symbol-b">{ }</span>
+            <span class="symbol symbol-c">[ ]</span>
+            <span class="symbol symbol-d">;</span>
+            <span class="symbol symbol-e">01</span>
+            <span class="symbol symbol-f">0101</span>
+            <span class="symbol symbol-g">=&gt;</span>
+            <span class="symbol symbol-h">&&</span>
+            <span class="symbol symbol-i">0x</span>
+            <span class="symbol symbol-j">()</span>
+            <span class="symbol symbol-k">!=</span>
+            <span class="symbol symbol-l">++</span>
+          </div>
+
+          <!-- SMALL PIXEL DECORATIONS -->
+          <span class="pixel-star star-one">✦</span>
+          <span class="pixel-star star-two">✧</span>
+          <span class="pixel-star star-three">✦</span>
+
+          <!-- DECORATIVE STATUS LINE -->
+          <div class="ambient-line"></div>
+
+        </div>
+      </div>
+
+
+      <!-- TOP AREA -->
+      <div id="top-area" class="relative z-10 w-full h-[37vh]">
+
+        <div id="title" class="absolute top-17.5 right-12.5">
+          <img
+            id="codebox-title-icon"
+            src="src/assets/icons/codebox title.png"
+            alt="CoDecipher"
+            class="w-175 h-auto"
+          >
+        </div>
+
+        <div
+          id="exit"
+          class="absolute top-5 left-5 flex items-center gap-2"
+        >
+          <img
+            id="exit-icon"
+            src="src/assets/icons/exit icon.svg"
+            alt=""
+            class="w-10 h-10"
+          >
+
+          <button
+            id="exit-button"
+            type="button"
+            class="bg-transparent font-['Just_Another_Hand'] text-[#8A2326] text-[40px] border-0 cursor-pointer p-0"
+          >
+            Exit Game
+          </button>
+        </div>
+
+      </div>
+
+      <!-- GAME MODES -->
+      <div
+        id="gamemodes"
+        class="relative z-10 w-full h-[60vh] min-h-107.5 overflow-visible"
+      >
+
+        <div
+          id="folder-container"
+          class="absolute inset-0 w-full h-full overflow-visible"
+        >
+
+          <!-- BOX BACKGROUND -->
+          <div
+            id="bg"
+            class="absolute bottom-8 left-0 w-full h-137.5 z-1"
+          >
+            <img
+              id="box-bg"
+              src="src/assets/images/box bg.png"
+              alt=""
+              class="w-full h-full object-fill"
+            >
+          </div>
+
+          <!-- FOLDERS -->
+          <div
+            id="folder-clip"
+            class="relative overflow-hidden w-full h-250 -top-82.5 z-2"
+          >
+
+            <!-- TRIVIA -->
+            <div
+              id="card-trv"
+              class="gamemode-card folder-card folder-trv"
+            >
+              <img
+                id="trv"
+                src="src/assets/images/trv.png"
+                alt="Trivia"
+                class="w-full h-full object-contain"
+              >
+            </div>
+
+            <!-- IMPOSTOR -->
+            <div
+              id="card-impstr"
+              class="gamemode-card folder-card folder-impstr"
+            >
+              <img
+                id="impstr"
+                src="src/assets/images/impstr.png"
+                alt="Impostor"
+                class="w-full h-full object-contain"
+              >
+            </div>
+
+            <!-- SQL DETECTIVE -->
+            <div
+              id="card-sqldtctv"
+              class="gamemode-card folder-card folder-sqldtctv"
+            >
+              <img
+                id="sqldtctv"
+                src="src/assets/images/sqldtctv.png"
+                alt="SQL Detective"
+                class="w-full h-full object-contain"
+              >
+            </div>
+
+            <!-- ALT+C4 -->
+            <button
+              data-mode="altc4"
+              data-info="altc4-info"
+              id="card-altc4"
+              type="button"
+              class="gamemode-card folder-card folder-altc4"
+            >
+              <img
+                id="altc4-unselected"
+                src="src/assets/images/alt+c4 - unselected.png"
+                alt="Alt+C4"
+                class="folder-unselected absolute inset-0 w-full h-full object-contain"
+              >
+
+              <img
+                id="altc4-selected"
+                src="src/assets/images/alt+c4 - selected.png"
+                alt="Alt+C4 Information"
+                class="folder-selected absolute inset-0 w-full h-full object-contain hidden"
+              >
+            </button>
+
+            <!-- CODEBLOCK -->
+            <button
+              data-mode="cdblck"
+              data-info="cdblck-info"
+              id="card-cdblck"
+              type="button"
+              class="gamemode-card folder-card folder-cdblck"
+            >
+              <img
+                id="cdblck-unselected"
+                src="src/assets/images/codeblock - unselected.png"
+                alt="CodeBlock"
+                class="folder-unselected absolute inset-0 w-full h-full object-contain"
+              >
+
+              <img
+                id="cdblck-selected"
+                src="src/assets/images/codeblock - selected.png"
+                alt="CodeBlock Information"
+                class="folder-selected absolute inset-0 w-full h-full object-contain hidden"
+              >
+            </button>
+
+            <!-- TYPEBYTE -->
+            <button
+              data-mode="typbyt"
+              data-info="typbyt-info"
+              id="card-typbyt"
+              type="button"
+              class="gamemode-card folder-card folder-typbyt"
+            >
+              <img
+                id="typbyt-unselected"
+                src="src/assets/images/typebyte - unselected.png"
+                alt="TypeByte"
+                class="folder-unselected absolute inset-0 w-full h-full object-contain"
+              >
+
+              <img
+                id="typbyt-selected"
+                src="src/assets/images/typebyte - selected.png"
+                alt="TypeByte Information"
+                class="folder-selected absolute inset-0 w-full h-full object-contain hidden"
+              >
+            </button>
+
+          </div>
+
+          <!-- BOX FRAME -->
+          <div
+            id="box-container"
+            class="absolute -bottom-40 left-0 w-full h-137.5 z-20 pointer-events-none"
+          >
+            <img
+              id="box"
+              src="src/assets/images/box.png"
+              alt=""
+              class="w-full h-full object-fill"
+            >
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+
+  </body>
+</html>
