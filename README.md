@@ -1,128 +1,72 @@
-# CoDecipher — Unmask the Code
+# CodeBox
 
-**CoDecipher** is a real-time multiplayer coding game: players fill in masked blanks (`___`) inside code snippets and race or team up to master programming concepts. Built for Hackathon Jam 2026 by *Barney and Friends*.
+CodeBox is a multiplayer programming game being developed for a school demonstration. A desktop host chooses a game, and players join from their browsers using a link, QR code, or room code.
 
-## Game modes
+## Current status
 
-| Mode | What happens |
-|------|--------------|
-| **Solo** | Practice at your own pace: pick a topic, answer 10 fill-in-the-blank questions, track your score. |
-| **Battle** | Two players race head-to-head on the same question; fastest fully-correct submission wins the round. |
-| **Co-op** | Two players work on the same challenge simultaneously — each fills their own half (e.g. frontend + backend), and combined answers are scored. |
+The project is being reorganized. The Tauri host contains an early menu and a visual CodeBlock lobby with example players. The three game folders currently contain starter scripts. The shared server is not yet runnable: `server/rooms/index.js` contains a room ID utility and disconnect-handler registry, but room creation, networking, and game sessions still need to be implemented. The browser player app is not built yet.
 
-**Topics:** C++, C#, Python, SQL, HTML/JS, OOP (solo) · HTML/PHP, JavaScript/React, Backend (co-op).
+The root package retains dependencies from the earlier project for future backend work. Its former server and question-validation commands referred to removed files and have been removed. The `.env.example` file is a reference from that earlier server, not a working configuration for CodeBox yet.
 
-## Quickstart
+## Planned game modes
 
-Prerequisites: **Node.js ≥ 20** and npm.
+- **CodeBlock:** A multiple-choice code quiz with timed scoring, question twists, explanations, and leaderboards. Up to eight players.
+- **TypeByte:** A cooperative typing challenge with bosses, player health, and a shared timer. Up to eight players.
+- **Alt+C4:** Two players take different roles to solve predefined, constrained code challenges before time or chances run out.
 
-```bash
-git clone https://github.com/mimirasol/CoDecipher.git
-cd CoDecipher
-npm install
-cp .env.example .env   # optional - see Environment variables below
-npm start
-```
+## Planned architecture
 
-Open **http://localhost:3000** — that's the whole local setup.
+A separate computer runs one shared backend for several desktop hosts. The backend manages rooms, serves the player browser app, runs the game rules, and communicates with hosts and players over WebSockets. Each desktop host controls one active room; rooms must remain isolated from one another.
 
-Common commands:
+One ngrok endpoint is planned for the shared backend. The player-facing domain opens the join page. When a host creates a room, the server will generate a room code; the host will show it alongside a link and QR code. The direct link can include the room code, while players opening the join page can enter it manually. Automatic tunnel startup, room creation, and joining are not implemented yet.
 
-| Command | What it does |
-|---------|--------------|
-| `npm start` | Start the server on `PORT` (default 3000). |
-| `npm run dev` | Same, with automatic restart on file changes (nodemon). |
-| `npm run validate` | Validate all question banks (schema + mask/answer consistency). |
-| `npm test` | Runs the validator (placeholder until a test suite is added). |
-
-## Environment variables
-
-Configuration comes from the process environment or a `.env` file in the project root (see `.env.example`). Everything is optional.
-
-| Variable | Default | Purpose |
-|----------|---------|---------|
-| `PORT` | `3000` | HTTP + WebSocket port. |
-| `NGROK_AUTHTOKEN` | *(unset)* | ngrok authtoken. When set, an online-play tunnel is created at startup. |
-| `NGROK_ENABLED` | `true` | Set to `false` to force local-only mode even when a token is present. |
-
-**ngrok is opt-in.** Without a token the server simply runs locally and prints a hint — no errors.
-
-## Online multiplayer with ngrok
-
-1. Sign up at [ngrok.com](https://dashboard.ngrok.com/signup) (free).
-2. Copy your authtoken from the [ngrok dashboard](https://dashboard.ngrok.com/get-started/your-authtoken).
-3. Put it in your `.env`:
-   ```
-   NGROK_AUTHTOKEN=your_token_here
-   ```
-4. `npm start` — the console prints a public `https://...ngrok...` URL. Share it; friends open it and pick a multiplayer mode.
-
-Notes: free-tier ngrok URLs change every run, and the tunnel exists only while the server runs.
+The server will be responsible for validating game actions, tracking state and timers, and sending each client only the information it needs. Disconnected players should be able to resume their room within a grace period. The duration, host-disconnect behavior, simultaneous-room target, and behavior after a server restart remain to be decided.
 
 ## Project structure
 
-```
-CoDecipher/
-├── server/                 # Node backend (Express + ws), CommonJS
-│   ├── index.js            # Entry point: config → static → WebSocket → listen
-│   ├── config.js           # .env loading + env var parsing
-│   ├── ws.js               # WebSocket server + message router
-│   ├── rooms.js            # Room-id generation + disconnect cleanup registry
-│   ├── battle.js           # Battle mode handlers
-│   ├── coop.js             # Co-op mode handlers (incl. scoring)
-│   ├── questions.js        # Question-bank loading (battle + co-op)
-│   └── ngrok.js            # Optional tunnel startup
-├── data/
-│   └── questions-coop/     # Co-op question banks (server-loaded, not public)
-├── public/                 # Everything the browser loads (URLs unchanged)
-│   ├── index.html          # Landing page
-│   ├── menu.html           # Mode selection
-│   ├── solo.html           # Solo mode page
-│   ├── multiplayer-battle.html
-│   ├── multiplayer-coop.html
-│   ├── solo-client.js      # Solo mode client logic
-│   ├── multiplayer-client-battle.js
-│   ├── multiplayer-client-coop.js
-│   └── questions/          # Solo question banks (fetched by the browser)
-├── scripts/
-│   └── validate-questions.js  # CI guardrail for question banks
-├── .github/workflows/ci.yml   # Validate + boot smoke test
-├── ARCHITECTURE.md         # How everything fits together - read this next
-└── .env.example            # Template for local configuration
+```text
+CodeBox/
+├── apps/
+│   ├── host/                 Tauri desktop app and shared host screens
+│   └── player/               Planned browser player app
+├── server/
+│   ├── rooms/                Room utilities; room management is planned
+│   └── networking/           Planned shared WebSocket layer
+├── games/
+│   ├── codeblock/
+│   ├── typebyte/
+│   └── altc4/
+│       ├── host/             Game-specific host screens
+│       ├── player/           Game-specific player screens
+│       ├── server/           Game rules, state, and scoring
+│       ├── data/             Game content, including server-only answers
+│       └── scripts/          Existing starter script
+├── shared/                   Planned shared message definitions/utilities
+└── docs/                     Space for project and technical documentation
 ```
 
-## Adding questions
+Each game folder has the same `host`, `player`, `server`, and `data` subfolders. Empty folders are tracked for future work; they don't indicate that a feature is implemented. Keep private answers and role-specific information on the server, and send only the appropriate information to each client.
 
-- **Solo topics** live in `public/questions/<topic>.json` (also reused by battle mode).
-- **Co-op banks** live in `data/questions-coop/<file>.json` (server-loaded only, so their answers are not publicly downloadable).
+## Run the host frontend
 
-Each solo question looks like:
+Install Node.js and npm, then from the repository root:
 
-```json
-{
-  "id": 1,
-  "topic": "Loops",
-  "question": "Print numbers 0 to 4 using a for-loop.",
-  "code_snippet": "for ___ in ___(___):\n    print(___)",
-  "answers": ["i", "range", "5", "i"]
-}
+```bash
+npm --prefix apps/host ci
+npm run host:dev
 ```
 
-The number of `___` masks **must equal** the number of answers (mask order = answer order). Co-op banks have their own per-player schema — see [ARCHITECTURE.md](ARCHITECTURE.md#data-formats).
+Open the URL printed by Vite. To make a production frontend build:
 
-After editing any bank, run `npm run validate` — CI runs the same check on every pull request.
+```bash
+npm run host:build
+```
 
-## Tech stack
+For the native desktop app, install the platform prerequisites for Tauri and Rust, then run:
 
-- **Backend:** Node.js (CommonJS), Express 5, `ws` (WebSocket)
-- **Frontend:** vanilla HTML/CSS/JS, no build step
-- **Tunneling:** `@ngrok/ngrok` (opt-in)
-- **Config:** `dotenv`
+```bash
+cd apps/host
+npx tauri dev
+```
 
-## Contributing
-
-Start with [ARCHITECTURE.md](ARCHITECTURE.md) for the module map, WebSocket protocol reference, and known limitations. Keep the WebSocket message protocol backward-compatible, and run `npm run validate` before submitting question changes.
-
-## License
-
-[MIT](LICENSE) — originally built by *Barney and Friends* for Hackathon Jam 2026.
+The host is still a prototype; running it does not start a backend, create a room, or expose an ngrok link.

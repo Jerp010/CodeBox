@@ -1,8 +1,7 @@
 {
-  "name": "codecipher",
+  "name": "codebox",
   "version": "1.0.0",
-  "description": "CoDecipher - multiplayer fill-in-the-blank coding quiz game (Hackathon Jam 2026, Barney and Friends)",
-  "main": "server/index.js",
+  "description": "CodeBox shared multiplayer backend (in development)",
   "private": true,
   "keywords": [
     "coding",
@@ -18,10 +17,8 @@
     "node": ">=20"
   },
   "scripts": {
-    "start": "node server/index.js",
-    "dev": "nodemon server/index.js",
-    "validate": "node scripts/validate-questions.js",
-    "test": "npm run validate"
+    "host:dev": "npm --prefix apps/host run dev",
+    "host:build": "npm --prefix apps/host run build"
   },
   "dependencies": {
     "@ngrok/ngrok": "^1.7.0",
@@ -31,13 +28,5 @@
   },
   "devDependencies": {
     "nodemon": "^3.1.11"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/mimirasol/CoDecipher.git"
-  },
-  "bugs": {
-    "url": "https://github.com/mimirasol/CoDecipher/issues"
-  },
-  "homepage": "https://github.com/mimirasol/CoDecipher#readme"
+  }
 }
