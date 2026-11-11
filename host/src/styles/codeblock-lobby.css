@@ -1,0 +1,166 @@
+.codeblock-lobby {
+  background-image: url("../assets/images/codeblock-lobby-bg.png");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.codeblock-lobby-art {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: max(100vw, 177.78vh);
+  aspect-ratio: 16 / 9;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+/* Container positioned over the teal floor area */
+/* Container positioned over the teal floor area */
+.codeblock-player-grid {
+  position: absolute;
+  top: 32%;
+  right: 5%;
+  width: 60%;
+  height: 60%;
+  pointer-events: auto;
+}
+
+/* -------------------------------------------------- */
+/* ISOMETRIC ROW TRACKS                               */
+/* -------------------------------------------------- */
+.iso-row {
+  position: absolute;
+  display: flex;
+  /* Negative margins pack adjacent blocks together without gaps */
+  margin: 0;
+  padding: 0;
+}
+
+/* Back Row: Shifted UP and RIGHT along the -30° depth axis */
+.iso-row.row-top {
+  top: 0;
+  left: 28%;
+  z-index: 1; /* Renders behind front row */
+}
+
+/* Front Row: Shifted DOWN and LEFT */
+.iso-row.row-bottom {
+  top: 32%;
+  left: 0;
+  z-index: 2; /* Renders in front */
+}
+
+/* -------------------------------------------------- */
+/* SLOTS STACKING ALONG THE +30° AXIS                 */
+/* -------------------------------------------------- */
+.codeblock-player-slot {
+  position: relative;
+  width: 85px;  /* Packs adjacent blocks closely */
+  height: 120px;
+  flex-shrink: 0;
+}
+
+/* Slot 1: Nathan / Jeff (Uppermost block -> Lowest z-index) */
+.iso-row .codeblock-player-slot:nth-child(1) { 
+  transform: translate(0, 0); 
+  z-index: 1; 
+}
+
+/* Slot 2: Josh / Anson */
+.iso-row .codeblock-player-slot:nth-child(2) { 
+  transform: translate(0, 48px); 
+  z-index: 2; 
+}
+
+/* Slot 3: Amira / Lars */
+.iso-row .codeblock-player-slot:nth-child(3) { 
+  transform: translate(0, 96px); 
+  z-index: 3; 
+}
+
+/* Slot 4: Lorraine / Jhervis (Bottom-most block -> Highest z-index / Top layer) */
+.iso-row .codeblock-player-slot:nth-child(4) { 
+  transform: translate(0, 144px); 
+  z-index: 4; 
+}
+
+/* -------------------------------------------------- */
+/* BLOCK GEOMETRY & SIZING (Maintained)               */
+/* -------------------------------------------------- */
+.iso-block {
+  --cap-w: 52px;
+  --block-h: 68px;
+  --block-len: 230px;
+
+  position: relative;
+  width: 30px;
+  height: 110px;
+}
+
+/* 1. Front Cap (White Face with Initial) */
+.iso-block .face-front {
+  position: absolute;
+  top: 30px;
+  left: 0;
+  width: var(--cap-w);
+  height: var(--block-h);
+  background: #ffffff;
+  transform: skewY(30deg);
+  transform-origin: top left;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3;
+  box-shadow: -3px 3px 6px rgba(0, 0, 0, 0.15);
+}
+
+.iso-block .player-initial {
+  font-family: 'Onest', sans-serif;
+  font-weight: 900;
+  font-size: 2.2rem;
+  line-height: 1;
+  color: var(--block-color, #888888);
+  transform: skewY(-10deg);
+}
+
+/* 2. Top Face (Illuminated Surface) */
+.iso-block .face-top {
+  position: absolute;
+  top: 30px;
+  left: 0;
+  width: var(--block-len);
+  height: calc(var(--cap-w) / 0.866);
+  background: var(--block-color, #b8b8b8);
+  filter: brightness(1.2);
+  transform: matrix(0.866, -0.5, 0.866, 0.5, 0, 0);
+  transform-origin: top left;
+  z-index: 1;
+}
+
+/* 3. Long Side Face (Base Color with Name) */
+.iso-block .face-side {
+  position: absolute;
+  top: calc(30px + (var(--cap-w) * 0.5774));
+  left: var(--cap-w);
+  width: calc(var(--block-len) * 0.866);
+  height: var(--block-h);
+  background: var(--block-color, #9e9e9e);
+  filter: brightness(0.92);
+  transform: skewY(-30deg);
+  transform-origin: top left;
+  display: flex;
+  align-items: center;
+  padding-left: 1.2rem;
+  z-index: 2;
+}
+
+.iso-block .player-name {
+  font-family: 'Onest', sans-serif;
+  font-weight: 800;
+  font-size: 1.35rem;
+  color: #ffffff;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.25);
+}
