@@ -6,7 +6,7 @@
 
 **Architecture:** A shared backend owns room identity, role permissions, round state, timing, submission evaluation, and reconnection. The Tauri host and two private browser views consume role-filtered state. The placeholder lobby and another programmer's final lobby share one integration contract.
 
-**Tech stack:** Follow the existing JavaScript, Tauri, Vite, Express, and ws conventions after verifying current manifests. Puzzle languages are Java, C++, and Python; the checking implementation is selected and documented in Phase 1.
+**Tech stack:** Tailwind CSS 4 is confirmed. Recommend React + TypeScript + Vite for new Alt+C4 interfaces, CodeMirror 6, and a TypeScript game-rules module compiled for the existing Node 24 LTS/Express/ws integration. Preserve existing JavaScript outside the minimum adapters. Use typed rule tests and Playwright browser flows. Puzzle languages remain Java, C++, and Python. See the [scoped stack recommendation and final planning audit](../specs/2026-11-16-altc4-stack.md); Phase 1 verifies the integration and records exact choices.
 
 **Spec:** [Confirmed brief](../specs/2026-11-16-altc4-brief.md).
 
@@ -14,9 +14,10 @@
 
 - Deadline: December 1, 2026. Reserve November 29-30 for integration/rehearsal as a proposed target; confirm capacity before promising intermediate dates.
 - Work on `ALTC4-jeff`. No new branch/worktree, push, merge, or deployment is included in the phase-commit instruction.
-- The current planning baseline is clean and the game is unimplemented. Recheck branch and working-tree state before implementation and every commit; preserve unrelated changes.
+- The game was unimplemented at the initial planning checkpoint. Recheck branch and working-tree state before implementation and every commit; preserve unrelated changes.
 - The desktop is separate from the two player devices and owns configuration/game start. Do not turn it into a player role.
 - The selected theme is playful retro bomb workshop in pixel art. Detailed visual treatments need review.
+- Use Tailwind CSS for Alt+C4 styling. The recommended React/TypeScript game frontend mounts into the existing host through an adapter; the other programmer's final lobby remains independent of its framework.
 - Another programmer owns the finished lobby. Our placeholder uses real room/configuration/game-start behavior and an explicit replacement boundary.
 - Three selectable puzzle languages, constrained editing, multiple panels, continuous time during checking, three chances, disconnect pause/reconnection, results, and lobby replay are required.
 - Chat deferral is a recommendation pending a decision. Configurable panel count and active-panel highlighting are desired enhancements; distinguish them from required multi-panel play and the shared host bomb view.
@@ -76,16 +77,18 @@ These are future completion targets, not claims that any implementation has pass
 **Work together:** Visual direction, screen flow, data/privacy boundaries, puzzle model, and lobby integration agreement. Settling these early prevents incompatible screens and server messages.
 
 - [ ] Inspect current instructions, manifests, relevant code, and the other programmer's integration needs. Record existing versus proposed files.
+- [ ] Review the scoped stack recommendation. Specify and prove the React mount/unmount, single-runtime dependency resolution, frontend/server TypeScript build boundaries, CommonJS adapter, and Tailwind shared-source detection before expanding implementation. Keep prototype/integration changes inside the approved phase scope.
 - [ ] Propose a small style guide: pixel scale, palette, text/code typography, reusable controls, asset dimensions/formats, states, and animation limits.
 - [ ] Produce matching host bomb, Spec Holder, and Programmer mockups, including checking/feedback and paused states. Get visual review before treating the exact style as approved.
 - [ ] Define room/round lifecycle, role permissions, server-only puzzle data, message contracts, and a replaceable-lobby contract.
 - [ ] Select and explain the constrained-edit checking approach for Java, C++, and Python; give representative correct, incorrect, and equivalent-answer examples.
+- [ ] Evaluate the recommended authored-puzzle validators with explicit bounded edit grammars and trusted behavior fixtures. Document language-specific limits, unsupported edits, and internal failures; do not imply general-purpose compiler execution.
 - [ ] Resolve or explicitly confirm proposed defaults: shared chance pool, language selection granularity, starter content quantities, duration/panel bounds, reconnect/resume/abandonment, and check timeouts/order during pause or expiry.
 - [ ] Record exact next-phase modules/interfaces and meaningful verification commands. Assess developer capacity against the deadline; agree scope changes rather than silently removing requirements.
 
-**Exit checks:** Reviewed screen designs remain readable at intended device sizes; exact interfaces and examples are documented; required behavior is distinguishable from proposals; lobby integration boundary is usable by the other programmer.
+**Exit checks:** Reviewed screen designs remain readable at intended device sizes; exact interfaces and examples are documented; required behavior is distinguishable from proposals; the scoped frontend/server build integration is demonstrated; lobby integration boundary is usable by the other programmer.
 
-**Suggested phase commit:** `docs(altc4): define art direction and game contracts`
+**Suggested phase commit:** `chore(altc4): define design and integration contracts`
 
 **Task report:** T1-T8 remain unimplemented; specifications are prepared. Chat and desired enhancements retain their recorded scope status.
 
@@ -94,6 +97,7 @@ These are future completion targets, not claims that any implementation has pass
 **Depends on:** Phase 1's room, permission, configuration, and lobby contracts.
 
 - [ ] Add the minimum runnable backend and browser entry point following existing conventions.
+- [ ] Add the approved Alt+C4 React/TypeScript entry/adapters, server compilation, and explicit type-check/build/test commands. Document the supported Node 24 LTS environment and keep dependency installation reproducible. Do not migrate unrelated game/menu code.
 - [ ] Implement room creation/joining, stable participant identity, one host plus two player slots, and room-scoped connections. Provide the chosen demo join route; retain compatibility with the planned shared endpoint.
 - [ ] Build the functional placeholder lobby with participants, host settings, random initial roles, readiness, start controls, and room/connection feedback.
 - [ ] Implement server-side random assignment of exactly one Spec Holder and one Programmer. Deliver private role views through functional browser shells.
@@ -146,9 +150,11 @@ These rules belong together: submission results change the shared chance pool an
 **Depends on:** Reviewed Phase 1 designs, real puzzle data, and Phase 4's live state/actions. Static components/assets may be prepared earlier after contracts are stable; do not mark live integration complete from mocks.
 
 - [ ] Build reusable visual controls and approved pixel-art assets with consistent scaling and readable typography.
+- [ ] Use shared Tailwind theme tokens and verified source scanning in both consuming app builds. Structure Alt+C4 views as focused React components with typed public state/actions.
 - [ ] Finish the host's shared workbench/bomb view, panel progress, time, chances, and outcome feedback while preserving private-role information.
 - [ ] Finish the private Spec Holder brief, manual/checklist, navigation, timer, and chances.
 - [ ] Finish the private Programmer panel navigation, locked/ editable code presentation, editor behavior, submissions, checking and error feedback, timer, and chances.
+- [ ] Integrate CodeMirror with explicit setup/update/cleanup for the permitted edit sections. Check that server ticks and UI re-renders retain draft text, focus, selection, and undo history, and that pasted edits cannot change locked context.
 - [ ] Bind every control and display to real actions/state. Include usable connection, checking, success/failure, and paused presentation.
 - [ ] Check intended device sizes, code/input usability, text contrast, focus handling, sharp asset scaling, and screen clarity during a real round.
 
@@ -179,6 +185,7 @@ These rules belong together: submission results change the shared chance pool an
 **Depends on:** All required behavior in Phases 1-6.
 
 - [ ] Run the relevant backend checks and host/player builds. Use commands that exist and record their actual output; the existing host build command is `npm run host:build`.
+- [ ] Run explicit frontend/server TypeScript checks separately from Vite builds. Use Node rule tests and multi-context Playwright flows for the approved stack; verify native Tauri separately on the real demo device.
 - [ ] Exercise the game on the actual desktop host plus two intended player devices, across the chosen demo network/join route. Browser-only host checks do not substitute for a native Tauri rehearsal.
 - [ ] Repeat the contract/privacy, cross-room, all-language, timing/outcome, reconnect, and replay checks after integration.
 - [ ] Review code readability and fix confusing modules/control flow. Check the main round path and lobby replacement boundary with the brief at hand.
@@ -229,4 +236,4 @@ If checks fail, keep working within the phase or report the blocker. Record the 
 
 ## Planning handoff
 
-Current state: phase roadmap and confirmed brief written; no game implementation or phase checkpoint commit has been made. The first execution step is Phase 1's repository/design/contract review. Exact style mockups, checker/default decisions, and Phase 2's precise file/interface plan remain to be produced and reviewed. The branch was `ALTC4-jeff` and clean before these planning documents were added.
+Current state: the initial phase roadmap and confirmed brief were committed as planning checkpoint `14581bf`. A scoped stack recommendation and final planning audit now accompany them; no game implementation phase is complete. The first execution step is Phase 1's repository/design/contract review. Exact style mockups, integration proof, checker/default decisions, and Phase 2's precise file/interface plan remain to be produced and reviewed. Preserve any unrelated working-tree edits when committing planning updates.
