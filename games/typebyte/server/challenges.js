@@ -29,9 +29,9 @@ function getChallenge(language, difficulty, usedIds = []) {
     const diff = String(difficulty).toUpperCase();
 
     if(!isSupportedLanguage(lang)) 
-        throw new Error(`Unsupported Language: ${language}`);
+        throw new Error(`Unsupported language: "${language}"`);
     if(!isSupportedDifficulty(diff))
-        throw new Error(`Unsupported Difficulty: ${difficulty}`);
+        throw new Error(`Unsupported difficulty: "${difficulty}"`);
 
     const challenges = CHALLENGES[lang][diff].map((syntax, index) => ({
         id: `${lang}:${diff}:${index}`,
@@ -47,7 +47,7 @@ function getChallenge(language, difficulty, usedIds = []) {
     return pickRandom(pool);
 }
 
-module.exports = { difficultyForBoss, getChallenge, LANGUAGES, DIFFICULTY };
+module.exports = { difficultyForBoss, getChallenge, isSupportedLanguage, LANGUAGES, DIFFICULTY };
 
 // DEBUG
 // console.log(getChallenge('python', 'MEDIUM'));
