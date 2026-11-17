@@ -1,11 +1,24 @@
+// @ts-check
 const { difficultyForBoss } = require('./challenges');
 const { BOSSES, BOSS_HEALTH_PER_PLAYER, MIN_PLAYER_COUNT, MAX_PLAYER_COUNT } = require('./constants');
+
+/**
+ * @typedef {Object}   Boss
+ * @property {number}  index
+ * @property {string}  id
+ * @property {string}  name
+ * @property {string}  difficulty
+ * @property {number}  maxHealth
+ * @property {number}  health
+ * @property {boolean} defeated
+ */
 
 /**
  * Creates the state for one boss. 
  *
  * @param {number} bossIndex - zero-based position of boss in BOSSES
  * @param {number} playerCount - players in the room.
+ * @returns {Boss} initialized boss object
  */
 function createBoss(bossIndex, playerCount) {
     if (bossIndex < 0 || bossIndex >= BOSSES.length) {
@@ -33,9 +46,9 @@ function createBoss(bossIndex, playerCount) {
 /**
  * Removes health from the boss and marks defeated at 0
  *
- * @param {object} boss
+ * @param {Boss} boss
  * @param {number} amount - damage dealt
- * @returns {object} same boss, mutated
+ * @returns {Boss} same boss object, mutated
  */
 function damageBoss(boss, amount) {
     if(boss.health <= 0) {
@@ -50,6 +63,12 @@ function damageBoss(boss, amount) {
     return boss;
 }
 
+/**
+ * True when there is another boss after the current boss
+ *
+ * @param {number} bossIndex - index of current boss
+ * @returns {boolean}
+ */
 function hasNextBoss(bossIndex) {
     return bossIndex + 1 < BOSSES.length;
 }
