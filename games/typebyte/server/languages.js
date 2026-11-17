@@ -1,11 +1,23 @@
 const { isSupportedLanguage, LANGUAGES } = require('./challenges');
+const { PLAYER_MAX_HEALTH } = require('./constants');
 
 /**
  * Creates the data for a player in the lobby. 
  * Every player starts with the first available language.
+ *
+ * @param {string} id  - player's unique id
+ * @param {string} name - display name
+ * @returns {object} initiliazed player object
  */
 function createPlayer(id, name) {
-    return { id, name, language: LANGUAGES[0] };
+    return {
+        id,
+        name,
+        language: LANGUAGES[0],
+        maxHealth: PLAYER_MAX_HEALTH,
+        health: PLAYER_MAX_HEALTH,
+        defeated: false,
+    };
 }
 
 /**
