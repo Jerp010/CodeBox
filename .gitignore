@@ -16,3 +16,8 @@ Thumbs.db
 # Logs
 *.log
 npm-debug.log*
+
+# Alt+C4 generated output
+/apps/player/dist/
+/dist-server/
+/artifacts/altc4/

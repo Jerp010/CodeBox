@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@source "../../games/altc4/ui";
 
 :root {
   font-family: Arial, sans-serif;

@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "CodeBox shared multiplayer backend (in development)",
   "private": true,
+  "workspaces": [
+    "apps/host",
+    "apps/player"
+  ],
   "keywords": [
     "coding",
     "quiz",
@@ -14,19 +18,37 @@
   "license": "MIT",
   "type": "commonjs",
   "engines": {
-    "node": ">=20"
+    "node": ">=24 <25"
   },
   "scripts": {
-    "host:dev": "npm --prefix apps/host run dev",
-    "host:build": "npm --prefix apps/host run build"
+    "host:dev": "npm --workspace host run dev",
+    "host:build": "npm --workspace host run build",
+    "player:dev": "npm --workspace player run dev",
+    "player:build": "npm --workspace player run build",
+    "altc4:build": "npm run altc4:typecheck && npm run altc4:server:build && npm run host:build && npm run player:build",
+    "altc4:typecheck": "tsc --noEmit -p tsconfig.frontend.json && tsc --noEmit -p tsconfig.server.json",
+    "altc4:server:build": "tsc -p tsconfig.server.json",
+    "altc4:test": "vitest run apps/host/scripts/altc4-host-entry.test.tsx",
+    "altc4:server:smoke": "node scripts/altc4-server-smoke.cjs",
+    "altc4:css:smoke": "node scripts/altc4-build-css-smoke.cjs",
+    "altc4:browser:qa": "node scripts/altc4-browser-qa.cjs",
+    "altc4:verify": "npm run altc4:build && npm run altc4:css:smoke && npm run altc4:test && npm run altc4:server:smoke && npm run altc4:browser:qa"
   },
   "dependencies": {
     "@ngrok/ngrok": "^1.7.0",
     "dotenv": "^18.0.5",
     "express": "^5.2.1",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
     "ws": "^8.19.0"
   },
   "devDependencies": {
-    "nodemon": "^3.1.11"
+    "@playwright/test": "^1.65.1",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "jsdom": "^26.1.0",
+    "nodemon": "^3.1.11",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.8"
   }
 }
