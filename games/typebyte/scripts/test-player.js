@@ -21,7 +21,7 @@ test("damagePlayer reduces health", () => {
 test("player is defeated when health reaches 0", () => {
     const player = createPlayer("p1", "Anson");
     for(let i = 0; i < PLAYER_MAX_HEALTH; i++) {
-        damagePlayer(player, i);
+        damagePlayer(player, 1);
     }
     assert.equal(player.health, 0);
     assert.equal(player.defeated, true);

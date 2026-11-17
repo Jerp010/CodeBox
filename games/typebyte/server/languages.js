@@ -1,5 +1,8 @@
+// @ts-check
 const { isSupportedLanguage, LANGUAGES } = require('./challenges');
 const { PLAYER_MAX_HEALTH } = require('./constants');
+
+/** @typedef {import('./player').Player} Player */
 
 /**
  * Creates the data for a player in the lobby. 
@@ -7,7 +10,7 @@ const { PLAYER_MAX_HEALTH } = require('./constants');
  *
  * @param {string} id  - player's unique id
  * @param {string} name - display name
- * @returns {object} initiliazed player object
+ * @returns {Player} initialized player object
  */
 function createPlayer(id, name) {
     return {
@@ -23,10 +26,10 @@ function createPlayer(id, name) {
 /**
  *  Changes player's language. Only allowed in lobby.
  * 
- * @param {object} player - player made by createPlayer
+ * @param {Player} player - player made by createPlayer
  * @param {string} language - e.g. "python"
  * @param {boolean} gameStarted
- * @returns {object} the same player object, mutated
+ * @returns {Player} the same player object, mutated
  */ 
 function setPlayerLanguage(player, language, gameStarted) {
     if(gameStarted) {

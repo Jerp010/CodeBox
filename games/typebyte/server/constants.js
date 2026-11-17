@@ -1,3 +1,4 @@
+// @ts-check
 const BOSSES = [
     { id: "syntax-slime",        name: "Syntax Slime" },
     { id: "bug-beast",           name: "Bug Beast" },

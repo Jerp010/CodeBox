@@ -1,9 +1,21 @@
+// @ts-check
+
+/**
+ * @typedef {Object}   Player
+ * @property {string}  id
+ * @property {string}  name
+ * @property {string}  language
+ * @property {number}  maxHealth
+ * @property {number}  health
+ * @property {boolean} defeated
+ */
+
 /**
  * Reduces health from a player and marks defeated at 0
  *
- * @param {object} player - created from createPlayer
+ * @param {Player} player - created from createPlayer
  * @param {number} amount - damage taken
- * @returns {object} same player, mutated
+ * @returns {Player} same player, mutated
  */
 function damagePlayer(player, amount) {
     if(!Number.isFinite(amount) || amount < 0) {
@@ -26,7 +38,7 @@ function damagePlayer(player, amount) {
  * True when all players is defeated (the team loses). 
  * An empty list is NOT a team defeat.
  *
- * @param {object[]} players - list of player object
+ * @param {Player[]} players - list of player object
  * @returns {boolean}
  */
 function allPlayersDefeated(players) {

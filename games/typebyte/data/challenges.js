@@ -1,5 +1,6 @@
 // sample for now 
 
+/** @type {Record<string, Record<string, string[]>>} */
 const CHALLENGES = {
     python: {
         EASY: [

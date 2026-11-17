@@ -1,7 +1,21 @@
+// @ts-check
 const { CHALLENGES, LANGUAGES, DIFFICULTY } = require('../data/challenges');
 
+/**
+ * @typedef {Object}   Challenge
+ * @property {string}  id
+ * @property {string}  language
+ * @property {string}  difficulty
+ * @property {string}  syntax
+ */
+
+/** @param {string} language */
 const isSupportedLanguage = (language) => LANGUAGES.includes(language);
+
+/** @param {string} difficulty */
 const isSupportedDifficulty = (difficulty) => DIFFICULTY.includes(difficulty);
+
+/** @param {Challenge[]} list */
 const pickRandom = (list) => list[Math.floor(Math.random() * list.length)];
 
 /**
@@ -17,12 +31,13 @@ function difficultyForBoss(bossIndex) {
 }
 
 /**
- * Picks a random challenge, avoiding ones already uses
+ * Picks a random challenge, avoiding ones already uses. If every challenge
+ * has been used, resets the pool and challenge can be picked again.
  *
  * @param {string} language
  * @param {string} difficulty
  * @param {string[]} [usedIds] - challenge ids already given
- * @returns {{id: string, language: string, difficulty: string, syntax: string}}
+ * @returns {Challenge}
  */ 
 function getChallenge(language, difficulty, usedIds = []) {
     const lang = String(language).toLowerCase();
@@ -47,7 +62,10 @@ function getChallenge(language, difficulty, usedIds = []) {
     return pickRandom(pool);
 }
 
-module.exports = { difficultyForBoss, getChallenge, isSupportedLanguage, LANGUAGES, DIFFICULTY };
-
-// DEBUG
-// console.log(getChallenge('python', 'MEDIUM'));
+module.exports = { 
+    difficultyForBoss, 
+    getChallenge, 
+    isSupportedLanguage, 
+    LANGUAGES, 
+    DIFFICULTY 
+};
