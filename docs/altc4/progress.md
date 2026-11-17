@@ -18,11 +18,14 @@ Authorized scope: implement and review phases 1–2 on `ALTC4-jeff`, create sepa
 
 ## Current checkpoint
 
-Phase 1 technical checkpoint passed; coordinator reviewed the contract, source diff,
-and rendered desktop/phone screenshots. Phase 2 implementation is next. User design
+Phases 1–2 implementation and automated checks passed; coordinator reviewed the
+contract, source diff, and rendered desktop/phone screenshots. Work stops before
+Phase 3. User design
 feedback, teammate lobby adoption, and physical/native rehearsal remain external
 follow-ups; mockup styling is provisional. Original tasks T1–T8 remain unimplemented
-at this checkpoint. Only the coordinator creates phase commits.
+at the Phase 1 checkpoint. T1 is now implemented and automatically verified; T3/T4
+have functional role shells only. Native/physical sign-off remains pending. Only
+the coordinator creates phase commits. See `phase1-2-report.md` for the final status.
 
 ## Review and verification evidence
 
@@ -42,3 +45,54 @@ at this checkpoint. Only the coordinator creates phase commits.
   browser inspection. Native Tauri and physical devices remain untested.
 - Capacity ruling: no human developer-hours estimate was supplied. December 1 is
   retained as the target, not a new delivery guarantee. No requirements were dropped.
+
+## Phase 2 implementation checkpoint
+
+- Phase 1 local commit: `7b298cf`. No push, branch creation, or deployment.
+- Freebuff completed contract and network-test authoring; its CLI was closed.
+  Saved project conversation: `2026-11-17T14-23-43.750Z` (local Freebuff resume ID).
+- One lower-cost Codex worker owns the backend; the Phase 1 worker reuses its
+  context for the live frontend and browser integration. A fresh stronger final
+  review is reserved for the completed changes. No unmeasured cost savings claimed.
+- Coordinator authored four additional adversarial tests and observed four RED
+  failures before the backend exists: host cross-room forgery, resume-token
+  rotation/takeover, readiness reset/stale-round rejection, changed-content reuse
+  of a request ID. These supplement Freebuff's eight acceptance tests.
+- Full round timer, puzzle validation, outcome logic, results/replay and recovery
+  remain out of this run. Phase 2 must show real role shells rather than fake play.
+- Independent `node --test tests/altc4/*.test.cjs` with loopback permission:
+  **15/15 passed** (eight Freebuff network tests, four coordinator adversarial
+  tests, three backend limits tests). No skipped or cancelled tests.
+- Frontend review found `crypto.randomUUID()` would depend on secure-context
+  browser support; a compatible request-ID path and a real browser regression
+  with that API disabled were requested. Authentication tokens remain generated
+  securely on the backend.
+
+## Final review and verification
+
+- Clean root `npm ci --no-audit --no-fund`: passed.
+- Coordinator's final `altc4:verify`: passed after all review fixes. Includes both
+  type checks and production builds, shared CSS assertions, one host lifecycle
+  test, CommonJS smoke, **16 backend tests**, static browser QA and live browser QA.
+- Live browser QA verified settings330s/4panels/Python, two complementary roles,
+  readiness/start, capacity/unauthorized rejection, reload resume, revoked-token
+  reset, and request-ID generation without `crypto.randomUUID`. Desktop1280×720
+  and phone-width390×844 layouts fit without horizontal document overflow.
+- Fresh Sol review: no critical finding. Fixed P2 unbound socket leakage with an
+  absolute10s handshake deadline; its regression failed before the fix and then
+  passed, including capacity recovery after rejected/active handshakes.
+- Ruling: revise the initial unqualified request-id promise to the actual last128
+  IDs/current-socket retry window. Supplied clients never auto-retry mutations
+  across resume. Cost if misused: a custom client can reapply an old authorized
+  config/ready mutation outside that scope. Reviewer agreed no ordinary supplied
+  Phase2-client bug requires a runtime journal under this contract. Phase4 must
+  add a round-scoped submission ledger before chance consumption.
+- Fixed both review minors: initial host mockup routing (observed RED browser
+  regression, corrected routing), and a rate-limit test that now uses repeated IDs.
+- Explicitly deferred to Phase6: disconnected seat retirement, room retirement,
+  abandonment, lost token-rotation replies and complete round recovery. Broader
+  recovery work would exceed this stop point; users must create a new room after
+  server restart. Puzzle privacy/checking, timers/outcomes/replay/editor persistence
+  remain in their planned later phases. Native/physical/LAN/HTTPS rehearsal remains
+  unverified and is not represented by browser contexts.
+- Final report: `docs/altc4/phase1-2-report.md`. Phase3 was not started.

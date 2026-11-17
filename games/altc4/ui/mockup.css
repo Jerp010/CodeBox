@@ -104,3 +104,83 @@
   .altc4-communication b { margin-left: 34px; }
   .altc4-footer { flex-direction: column; }
 }
+
+.altc4-lobby-shell { padding-bottom: 30px; }
+.altc4-live-banner { border-color: #a6c28b; background: #e9f2df; color: #426240; }
+.altc4-setup-card { width: min(100%, 620px); margin: 0 auto; padding: clamp(18px, 4vw, 30px); }
+.altc4-setup-card h1 { margin: 5px 0 7px; font-size: clamp(25px, 4vw, 34px); letter-spacing: -.04em; }
+.altc4-setup-card > p, .altc4-lobby-main-card > p, .altc4-share-card > p, .altc4-lobby-status-card p, .altc4-role-shell-card p { color: var(--alt-muted); font-size: 14px; line-height: 1.55; }
+.altc4-setup-card > p { margin: 0 0 20px; }
+.altc4-field { display: grid; gap: 7px; margin: 14px 0; color: var(--alt-ink); font-size: 13px; font-weight: 600; }
+.altc4-field > span { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.altc4-field > span b { color: var(--alt-green); font: 13px 'DM Mono', monospace; }
+.altc4-field input:not([type=range]), .altc4-field select { width: 100%; min-height: 43px; padding: 9px 11px; border: 1px solid var(--alt-line); border-radius: 3px; background: #fffdf7; color: var(--alt-ink); font: 14px 'Space Grotesk', sans-serif; }
+.altc4-field input:focus-visible, .altc4-field select:focus-visible, .altc4-ready-control input:focus-visible { outline: 3px solid #88a548; outline-offset: 2px; }
+.altc4-field input[type=range] { width: 100%; accent-color: var(--alt-green); }
+.altc4-field small { color: var(--alt-muted); font-size: 12px; font-weight: 400; }
+.altc4-wide-button { width: 100%; min-height: 46px; margin-top: 8px; font-size: 13px; }
+.altc4-field-hint { margin: 10px 0 0; color: var(--alt-muted); font-size: 13px; }
+.altc4-endpoint-hint { display: grid; gap: 5px; margin: 17px 0 10px; padding: 11px 12px; border: 1px solid var(--alt-line); background: #f5f0e2; }
+.altc4-endpoint-hint span { color: var(--alt-muted); font: 9px 'DM Mono', monospace; letter-spacing: .1em; }
+.altc4-endpoint-hint code { overflow-wrap: anywhere; color: var(--alt-green); font: 12px 'DM Mono', monospace; }
+.altc4-endpoint-hint small { color: var(--alt-muted); font-size: 11px; }
+.altc4-error-notice { display: grid; gap: 3px; margin: 0 auto 17px; padding: 12px 14px; width: min(100%, 900px); border: 1px solid #d9aaa5; background: #f8e8e3; color: #682e2a; }
+.altc4-error-notice b { font: 10px 'DM Mono', monospace; letter-spacing: .08em; }
+.altc4-error-notice span { font-size: 13px; line-height: 1.45; }
+.altc4-error-notice small { color: #88524d; font-size: 11px; }
+.altc4-connection-chip { display: inline-flex; align-items: center; gap: 7px; padding: 7px 9px; border: 1px solid var(--alt-line); background: #fffaf0; color: var(--alt-muted); font: 10px 'DM Mono', monospace; text-transform: uppercase; }
+.altc4-connection-chip i { width: 7px; height: 7px; background: #a98645; border-radius: 50%; }
+.altc4-connection-chip.connection-connected i, .altc4-connection-notice.connection-connected .connection-dot { background: #63a04f; }
+.altc4-connection-chip.connection-disconnected i, .altc4-connection-notice.connection-disconnected .connection-dot { background: var(--alt-red); }
+.altc4-connection-notice { display: flex; align-items: center; gap: 9px; margin: 0 0 15px; padding: 10px 12px; border: 1px solid #ccd8c2; background: #eef3e8; }
+.altc4-connection-notice .connection-dot { flex: 0 0 auto; }
+.altc4-connection-notice b { display: block; font: 10px 'DM Mono', monospace; text-transform: uppercase; }
+.altc4-connection-notice small { display: block; margin-top: 2px; color: var(--alt-muted); font-size: 12px; line-height: 1.4; }
+.altc4-lobby-grid { align-items: start; }
+.altc4-lobby-main-card, .altc4-share-card, .altc4-lobby-status-card, .altc4-role-shell-card { padding: 18px 20px; }
+.altc4-config-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px 18px; margin: 14px 0; }
+.altc4-config-grid .altc4-field:last-child { grid-column: 1 / -1; }
+.altc4-section-divider { height: 1px; margin: 18px 0; background: var(--alt-line); }
+.altc4-participant-list { display: grid; gap: 8px; margin: 13px 0; }
+.altc4-participant-card { display: flex; align-items: center; gap: 9px; min-height: 58px; padding: 8px 10px; border: 1px solid var(--alt-line); background: #fffdf7; }
+.altc4-participant-card .altc4-avatar { width: 34px; height: 34px; }
+.participant-copy { min-width: 0; flex: 1; }
+.participant-copy b { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; }
+.participant-copy small { display: block; margin-top: 2px; color: var(--alt-muted); font-size: 11px; }
+.altc4-participant-status, .altc4-ready-pill { flex: 0 0 auto; color: var(--alt-muted); font: 9px 'DM Mono', monospace; }
+.altc4-participant-status.status-connected { color: #4e824a; }
+.altc4-ready-pill { min-width: 76px; padding: 5px 6px; text-align: center; border: 1px solid var(--alt-line); }
+.altc4-ready-pill.is-ready { border-color: #a6c28b; background: #e7f1d9; color: #426240; }
+.altc4-start-row { display: flex; justify-content: space-between; align-items: center; gap: 14px; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--alt-line); }
+.altc4-start-row b, .altc4-start-row small { display: block; }
+.altc4-start-row b { font-size: 13px; }.altc4-start-row small { margin-top: 3px; color: var(--alt-muted); font-size: 11px; }
+.altc4-start-row .altc4-button { min-width: 130px; }
+.altc4-share-card h2, .altc4-lobby-status-card strong { display: block; margin: 4px 0 9px; font-size: 18px; }
+.altc4-share-code { display: block; margin: 10px 0 5px; color: var(--alt-green); font: 700 clamp(31px, 5vw, 43px) 'DM Mono', monospace; letter-spacing: .13em; }
+.altc4-share-card .altc4-field { margin-top: 17px; }
+.altc4-share-card input[readonly] { font-size: 12px; }
+.altc4-lobby-status-card > strong { font-size: 16px; }
+.altc4-player-lobby-grid { grid-template-columns: minmax(0, 1.4fr) minmax(250px, .7fr); }
+.altc4-player-lobby-grid .altc4-lobby-main-card h2 { margin: 6px 0 7px; font-size: 20px; }
+.altc4-ready-control { display: flex; align-items: flex-start; gap: 10px; margin-top: 18px; padding: 14px; border: 1px solid #a6c28b; background: #e9f2df; cursor: pointer; }
+.altc4-ready-control input { flex: 0 0 auto; width: 18px; height: 18px; margin: 2px 0 0; accent-color: var(--alt-green); }
+.altc4-ready-control b, .altc4-ready-control small { display: block; }
+.altc4-ready-control b { font-size: 14px; }.altc4-ready-control small { margin-top: 3px; color: var(--alt-muted); font-size: 12px; }
+.altc4-role-shell-card { max-width: 760px; margin: 0 auto; }
+.altc4-role-shell-card h2 { margin: 5px 0; font-size: 21px; }
+.altc4-round-boundary { display: flex; align-items: center; gap: 12px; margin-top: 16px; padding: 12px; border: 1px solid var(--alt-line); background: #f5f0e2; color: var(--alt-muted); font: 10px 'DM Mono', monospace; }
+.altc4-round-boundary strong { color: var(--alt-green); font-size: 16px; }
+
+@media (max-width: 800px) {
+  .altc4-player-lobby-grid { grid-template-columns: minmax(0, 1fr); }
+  .altc4-lobby-main-card, .altc4-share-card, .altc4-lobby-status-card, .altc4-role-shell-card { padding: 15px; }
+}
+@media (max-width: 460px) {
+  .altc4-config-grid { grid-template-columns: minmax(0, 1fr); }
+  .altc4-config-grid .altc4-field:last-child { grid-column: auto; }
+  .altc4-participant-card { flex-wrap: wrap; }
+  .participant-copy { flex-basis: 100px; }
+  .altc4-start-row { align-items: stretch; flex-direction: column; }
+  .altc4-start-row .altc4-button { width: 100%; }
+  .altc4-field small, .altc4-participant-status, .altc4-ready-pill, .altc4-connection-notice small { font-size: 12px; }
+}

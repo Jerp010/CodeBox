@@ -14,6 +14,7 @@
     "apps/host/scripts/altc4-host-entry.tsx",
     "apps/host/scripts/altc4-host-entry.test.tsx",
     "apps/player/main.tsx",
-    "games/altc4/ui/**/*.tsx"
+    "games/altc4/ui/**/*.tsx",
+    "games/altc4/ui/**/*.ts"
   ]
 }

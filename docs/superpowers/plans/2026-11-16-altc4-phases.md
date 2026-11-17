@@ -10,6 +10,8 @@
 
 **Spec:** [Confirmed brief](../specs/2026-11-16-altc4-brief.md).
 
+**Execution checkpoint:** Phases 1–2 implementation and automated checks are recorded in [the phase report](../../altc4/phase1-2-report.md). The checked work items below describe implemented work; native Tauri, physical three-device validation, teammate adoption, and user review of provisional styling remain outstanding. Phase 3 has not started.
+
 ## Global constraints
 
 - Deadline: December 1, 2026. Reserve November 29-30 for integration/rehearsal as a proposed target; confirm capacity before promising intermediate dates.
@@ -76,15 +78,15 @@ These are future completion targets, not claims that any implementation has pass
 
 **Work together:** Visual direction, screen flow, data/privacy boundaries, puzzle model, and lobby integration agreement. Settling these early prevents incompatible screens and server messages.
 
-- [ ] Inspect current instructions, manifests, relevant code, and the other programmer's integration needs. Record existing versus proposed files.
-- [ ] Review the scoped stack recommendation. Specify and prove the React mount/unmount, single-runtime dependency resolution, frontend/server TypeScript build boundaries, CommonJS adapter, and Tailwind shared-source detection before expanding implementation. Keep prototype/integration changes inside the approved phase scope.
-- [ ] Propose a small style guide: pixel scale, palette, text/code typography, reusable controls, asset dimensions/formats, states, and animation limits.
-- [ ] Produce matching host bomb, Spec Holder, and Programmer mockups, including checking/feedback and paused states. Get visual review before treating the exact style as approved.
-- [ ] Define room/round lifecycle, role permissions, server-only puzzle data, message contracts, and a replaceable-lobby contract.
-- [ ] Select and explain the constrained-edit checking approach for Java, C++, and Python; give representative correct, incorrect, and equivalent-answer examples.
-- [ ] Evaluate the recommended authored-puzzle validators with explicit bounded edit grammars and trusted behavior fixtures. Document language-specific limits, unsupported edits, and internal failures; do not imply general-purpose compiler execution.
-- [ ] Resolve or explicitly confirm proposed defaults: shared chance pool, language selection granularity, starter content quantities, duration/panel bounds, reconnect/resume/abandonment, and check timeouts/order during pause or expiry.
-- [ ] Record exact next-phase modules/interfaces and meaningful verification commands. Assess developer capacity against the deadline; agree scope changes rather than silently removing requirements.
+- [x] Inspect current instructions, manifests, relevant code, and the other programmer's integration needs. Record existing versus proposed files.
+- [x] Review the scoped stack recommendation. Specify and prove the React mount/unmount, single-runtime dependency resolution, frontend/server TypeScript build boundaries, CommonJS adapter, and Tailwind shared-source detection before expanding implementation. Keep prototype/integration changes inside the approved phase scope.
+- [x] Propose a small style guide: pixel scale, palette, text/code typography, reusable controls, asset dimensions/formats, states, and animation limits.
+- [x] Produce matching host bomb, Spec Holder, and Programmer mockups, including checking/feedback and paused states. Get visual review before treating the exact style as approved.
+- [x] Define room/round lifecycle, role permissions, server-only puzzle data, message contracts, and a replaceable-lobby contract.
+- [x] Select and explain the constrained-edit checking approach for Java, C++, and Python; give representative correct, incorrect, and equivalent-answer examples.
+- [x] Evaluate the recommended authored-puzzle validators with explicit bounded edit grammars and trusted behavior fixtures. Document language-specific limits, unsupported edits, and internal failures; do not imply general-purpose compiler execution.
+- [x] Resolve or explicitly confirm proposed defaults: shared chance pool, language selection granularity, starter content quantities, duration/panel bounds, reconnect/resume/abandonment, and check timeouts/order during pause or expiry.
+- [x] Record exact next-phase modules/interfaces and meaningful verification commands. Assess developer capacity against the deadline; agree scope changes rather than silently removing requirements.
 
 **Exit checks:** Reviewed screen designs remain readable at intended device sizes; exact interfaces and examples are documented; required behavior is distinguishable from proposals; the scoped frontend/server build integration is demonstrated; lobby integration boundary is usable by the other programmer.
 
@@ -96,12 +98,12 @@ These are future completion targets, not claims that any implementation has pass
 
 **Depends on:** Phase 1's room, permission, configuration, and lobby contracts.
 
-- [ ] Add the minimum runnable backend and browser entry point following existing conventions.
-- [ ] Add the approved Alt+C4 React/TypeScript entry/adapters, server compilation, and explicit type-check/build/test commands. Document the supported Node 24 LTS environment and keep dependency installation reproducible. Do not migrate unrelated game/menu code.
-- [ ] Implement room creation/joining, stable participant identity, one host plus two player slots, and room-scoped connections. Provide the chosen demo join route; retain compatibility with the planned shared endpoint.
-- [ ] Build the functional placeholder lobby with participants, host settings, random initial roles, readiness, start controls, and room/connection feedback.
-- [ ] Implement server-side random assignment of exactly one Spec Holder and one Programmer. Deliver private role views through functional browser shells.
-- [ ] Validate host-only configuration/start actions, player capacity, duplicate identities, wrong-role actions, and room isolation.
+- [x] Add the minimum runnable backend and browser entry point following existing conventions.
+- [x] Add the approved Alt+C4 React/TypeScript entry/adapters, server compilation, and explicit type-check/build/test commands. Document the supported Node 24 LTS environment and keep dependency installation reproducible. Do not migrate unrelated game/menu code.
+- [x] Implement room creation/joining, stable participant identity, one host plus two player slots, and room-scoped connections. Provide the chosen demo join route; retain compatibility with the planned shared endpoint.
+- [x] Build the functional placeholder lobby with participants, host settings, random initial roles, readiness, start controls, and room/connection feedback.
+- [x] Implement server-side random assignment of exactly one Spec Holder and one Programmer. Deliver private role views through functional browser shells.
+- [x] Validate host-only configuration/start actions, player capacity, duplicate identities, wrong-role actions, and room isolation.
 
 **Exit checks:** A desktop host and two real browser devices join the same room and receive exactly one of each role; host settings synchronize; a third player and cross-room/unauthorized actions are rejected; the other programmer can use the documented lobby contract. No stubbed network state counts as passing.
 
@@ -134,6 +136,7 @@ These rules belong together: submission results change the shared chance pool an
 
 - [ ] Implement the server-owned round state and configured duration. Send enough timing information for consistent client displays; do not trust client clocks to decide outcomes.
 - [ ] Build a plain functional host/role game view to exercise real state before final styling.
+- [ ] Add round-scoped submission-id deduplication before chance consumption. The Phase 2 transport cache protects only the last 128 requests on a single socket and cannot provide this guarantee.
 - [ ] Connect checking outcomes to chances and solved-panel progress. Count each checked incorrect submission once; define checker-failure behavior using Phase 1's decision.
 - [ ] Defuse only when every required panel succeeds in time. Detonate at zero time or zero chances. Stop accepting game mutations after a terminal outcome.
 - [ ] Implement the pause/resume state foundation and agreed handling of in-flight checks. Complete user-facing reconnection recovery in Phase 6.

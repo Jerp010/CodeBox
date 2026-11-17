@@ -45,7 +45,11 @@ async function main() {
     for (const size of sizes) {
       await page.setViewportSize({ width: size.width, height: size.height });
       for (const role of roles) {
-        await page.goto(`${serverUrl}?role=${role}`, { waitUntil: 'networkidle' });
+        await page.goto(`${serverUrl}?mockup=1&role=${role}`, { waitUntil: 'networkidle' });
+        const initialRole = await page.locator('select').nth(0).inputValue();
+        if (initialRole !== role) {
+          throw new Error(`Mockup route requested ${role}, initially rendered ${initialRole}`);
+        }
         await page.locator('select').nth(0).selectOption(role);
         await page.locator('select').nth(1).selectOption('ready');
         const report = await page.evaluate(() => ({
@@ -79,7 +83,7 @@ async function main() {
 
     for (const state of ['checking', 'paused']) {
       for (const role of roles) {
-        await page.goto(`${serverUrl}?role=${role}`, { waitUntil: 'networkidle' });
+        await page.goto(`${serverUrl}?mockup=1&role=${role}`, { waitUntil: 'networkidle' });
         await page.locator('select').nth(0).selectOption(role);
         await page.locator('select').nth(1).selectOption(state);
         const heading = state === 'checking' ? 'CHECKING PATCH' : 'ROUND PAUSED';

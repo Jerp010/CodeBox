@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { MockupApp } from '../../../games/altc4/ui/MockupApp';
+import { HostLobby } from '../../../games/altc4/ui/LobbyScreens';
 
 function HostEntry() {
-  const [isOpen, setIsOpen] = useState(false);
+  const mockupOnly = new URLSearchParams(window.location.search).get('mockup') === '1';
+  const [isOpen, setIsOpen] = useState(mockupOnly);
 
   useEffect(() => {
     const menu = document.querySelector<HTMLElement>('#main-menu');
@@ -13,11 +15,10 @@ function HostEntry() {
     };
   }, [isOpen]);
 
-  if (!isOpen) {
-    return <button className="altc4-host-launcher" onClick={() => setIsOpen(true)}>Open Alt+C4 host mockup</button>;
-  }
+  if (mockupOnly && isOpen) return <div className="altc4-host-overlay"><MockupApp initialRole="host" onExit={() => setIsOpen(false)} /></div>;
+  if (!isOpen) return <button className="altc4-host-launcher" onClick={() => setIsOpen(true)}>Open Alt+C4 host lobby</button>;
 
-  return <div className="altc4-host-overlay"><MockupApp initialRole="host" onExit={() => setIsOpen(false)} /></div>;
+  return <div className="altc4-host-overlay"><HostLobby onExit={() => setIsOpen(false)} /></div>;
 }
 
 export function mountAltC4Host(container: HTMLElement) {

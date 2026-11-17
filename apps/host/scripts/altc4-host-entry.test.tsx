@@ -8,7 +8,7 @@ import { mountAltC4Host } from './altc4-host-entry';
 describe('host adapter lifecycle', () => {
   afterEach(() => { document.body.replaceChildren(); });
 
-  it('opens the mockup, returns to the existing menu, unmounts, and mounts again', () => {
+  it('opens the live lobby shell, returns to the existing menu, unmounts, and mounts again', () => {
     document.body.innerHTML = '<main id="app"><section id="main-menu">Existing menu</section></main>';
     const app = document.querySelector<HTMLElement>('#app')!;
     const menu = document.querySelector<HTMLElement>('#main-menu')!;
@@ -17,15 +17,15 @@ describe('host adapter lifecycle', () => {
 
     let cleanup = () => {};
     act(() => { cleanup = mountAltC4Host(host); });
-    expect(host.textContent).toContain('Open Alt+C4 host mockup');
+    expect(host.textContent).toContain('Open Alt+C4 host lobby');
 
     act(() => { host.querySelector<HTMLButtonElement>('button')!.click(); });
     expect(menu.hidden).toBe(true);
-    expect(host.textContent).toContain('MOCKUP');
+    expect(host.textContent).toContain('CREATE A ROOM');
 
     act(() => { host.querySelector<HTMLButtonElement>('.altc4-button-quiet')!.click(); });
     expect(menu.hidden).toBe(false);
-    expect(host.textContent).toContain('Open Alt+C4 host mockup');
+    expect(host.textContent).toContain('Open Alt+C4 host lobby');
 
     act(() => cleanup());
     expect(host.childElementCount).toBe(0);
@@ -34,7 +34,7 @@ describe('host adapter lifecycle', () => {
     const remount = document.createElement('div');
     app.append(remount);
     act(() => { cleanup = mountAltC4Host(remount); });
-    expect(remount.textContent).toContain('Open Alt+C4 host mockup');
+    expect(remount.textContent).toContain('Open Alt+C4 host lobby');
     act(() => cleanup());
     expect(remount.childElementCount).toBe(0);
   });

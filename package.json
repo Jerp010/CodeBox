@@ -28,11 +28,14 @@
     "altc4:build": "npm run altc4:typecheck && npm run altc4:server:build && npm run host:build && npm run player:build",
     "altc4:typecheck": "tsc --noEmit -p tsconfig.frontend.json && tsc --noEmit -p tsconfig.server.json",
     "altc4:server:build": "tsc -p tsconfig.server.json",
+    "altc4:server:start": "npm run altc4:server:build && npm run player:build && node server/index.js",
     "altc4:test": "vitest run apps/host/scripts/altc4-host-entry.test.tsx",
     "altc4:server:smoke": "node scripts/altc4-server-smoke.cjs",
     "altc4:css:smoke": "node scripts/altc4-build-css-smoke.cjs",
     "altc4:browser:qa": "node scripts/altc4-browser-qa.cjs",
-    "altc4:verify": "npm run altc4:build && npm run altc4:css:smoke && npm run altc4:test && npm run altc4:server:smoke && npm run altc4:browser:qa"
+    "altc4:lobby:qa": "node scripts/altc4-lobby-browser-qa.cjs",
+    "altc4:verify": "npm run altc4:build && npm run altc4:css:smoke && npm run altc4:test && npm run altc4:server:smoke && npm run altc4:server:test && npm run altc4:browser:qa && npm run altc4:lobby:qa",
+    "altc4:server:test": "node --test tests/altc4/*.test.cjs"
   },
   "dependencies": {
     "@ngrok/ngrok": "^1.7.0",
@@ -44,8 +47,10 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.65.1",
+    "@types/node": "^26.6.6",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
+    "@types/ws": "^8.18.2",
     "jsdom": "^26.1.0",
     "nodemon": "^3.1.11",
     "typescript": "^5.9.3",

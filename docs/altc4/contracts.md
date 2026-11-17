@@ -105,9 +105,16 @@ Handshake, before any room state is delivered:
   the same `participantId`. Invalid tokens never displace a live socket.
 - Request correlation: every client message carries a unique `id` (UUID or
   `crypto.randomUUID`); every response/error echoes it in `payload.requestId` or
-  the envelope. One outcome per `id`; duplicates of the same `id` are answered
-  idempotently without re-applying effects. `id` is required on all messages;
-  missing/duplicate-in-flight ids are `bad_request`.
+  the envelope. Phase 2 caches the most recent 128 responses on the current
+  WebSocket: retrying one of those identical requests returns its cached response
+  without re-applying effects. Changed content under a cached id is rejected.
+  Clients must use fresh ids for new actions and must not retransmit mutations
+  after reconnect or outside that retry window. Resume obtains current room state;
+  the client then decides any new action with a fresh id. The supplied client does
+  not automatically resend mutations. Lifetime/cross-connection exactly-once
+  delivery is not provided. `id` is required on all messages. Phase 4 must add
+  round-scoped submission deduplication before chances/checking are implemented;
+  the start gate independently prevents starting the same round twice.
 - Payload limits: 32 KiB per frame (reject larger → `payload_too_large`, no
   processing), 200-char display names, one editable-slot text ≤ 1 KiB per panel,
   ≤ 10 messages/s per socket (`rate_limited` without state change).
