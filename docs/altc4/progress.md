@@ -1,6 +1,39 @@
 # Alt+C4 phase 1–2 handoff ledger
 
-Authorized scope: implement and review phases 1–2 on `ALTC4-jeff`, create separate local phase commits, stop before phase 3, and report detailed evidence. No push or deployment. The user's existing `.gitignore` change is unrelated and must remain outside these commits.
+Original phase 1–2 scope: implement and review phases 1–2 on `ALTC4-jeff`, create separate local phase commits, stop before phase 3, and report detailed evidence. No push or deployment. The user's existing `.gitignore` change is unrelated and must remain outside these commits.
+
+## November 18 maintenance checkpoint
+
+- Current source confirms Phase 1 `7b298cf` and Phase 2 `9f611dc`; Phase 3 is
+  unstarted. Original task statuses have not changed. Native/physical validation,
+  teammate lobby adoption and provisional visual/default decisions remain open.
+- Applied the project-local Ponytail guidance to a focused cleanup: share
+  role-view selection, copy room state once per broadcast, derive the start gate
+  from its blocked reason, remove unused client plumbing, and add short function
+  and logic comments. Exported interfaces and game behavior are preserved.
+- Corrected role-assignment copy, the stale planning handoff, and the distinction
+  between implemented lobby messages and future contract fields/actions.
+- Added [the maintenance and learning guide](maintenance-guide.md): source map,
+  end-to-end action trace, findings, phase-by-phase file/dependency/check guidance,
+  and a first puzzle-data exercise for the user. No next-phase code was added.
+- Confirmed with a temporary real-browser probe: a valid saved session overrides
+  another room's invite in the same tab. This remains documented for explicit
+  leave/change-room policy in Phase 6; resume behavior was not changed here.
+- Baseline and final `npm run altc4:verify` passed with local connection access
+  and the cached Chromium executable supplied through
+  `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH`: both TypeScript checks, both production
+  builds, CSS smoke, one host lifecycle test, CommonJS smoke, all 16 backend tests,
+  static browser QA and live lobby QA. No test skips/cancellations were reported.
+- The initial restricted verification stopped at network tests. Running a test
+  directly exposed `listen EPERM` on loopback; rerunning with connection access
+  passed. No product-code test failure remained in the final run.
+- Reviewed the source diff, checked edited Markdown links and ran
+  `git diff --check`. Existing `.gitignore` edits and untracked `.agents/` are
+  outside the cleanup commit. No push or deployment is authorized.
+- Next concrete action: the user sketches one Python panel and its private
+  fixtures in a new `games/altc4/data/puzzles.ts`, following the guide. Review that
+  attempt before implementing parsing/checking. Native Tauri, physical devices,
+  LAN/HTTPS/WSS endpoints and gameplay remain unverified.
 
 ## Execution decisions
 

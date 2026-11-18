@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { LobbyClient, readLobbySession } from './lobbyClient';
-import type { AssignedRole, LobbyError, LobbyState, LobbyView, PlayerRole, PuzzleLanguage } from './lobbyProtocol';
+import type { AssignedRole, LobbyError, LobbyState, LobbyView, PuzzleLanguage } from './lobbyProtocol';
 
 const languages: Array<{ value: PuzzleLanguage; label: string }> = [
   { value: 'java', label: 'Java' },
@@ -8,6 +8,7 @@ const languages: Array<{ value: PuzzleLanguage; label: string }> = [
   { value: 'python', label: 'Python' },
 ];
 
+// Own the host connection and render room creation, the placeholder lobby, or role shell.
 export function HostLobby({ onExit }: { onExit?: () => void }) {
   const [client] = useState(() => new LobbyClient());
   const [view, setView] = useState<LobbyView>({ state: null, roleView: null, participantId: null, status: 'idle', error: null, resumed: false });
@@ -30,6 +31,7 @@ export function HostLobby({ onExit }: { onExit?: () => void }) {
     if (config) setDraftConfig(config);
   }, [view.state?.config.durationSec, view.state?.config.panelCount, view.state?.config.language]);
 
+  // Keep pending host actions and their errors visible until the server replies.
   const run = async (action: () => Promise<void>) => {
     setBusy(true);
     setActionError(null);
@@ -62,6 +64,7 @@ export function HostLobby({ onExit }: { onExit?: () => void }) {
   </main>;
 }
 
+// Join or resume this tab’s player identity and render only its assigned station.
 export function PlayerLobby() {
   const [client] = useState(() => new LobbyClient());
   const [view, setView] = useState<LobbyView>({ state: null, roleView: null, participantId: null, status: 'idle', error: null, resumed: false });
@@ -81,6 +84,7 @@ export function PlayerLobby() {
     void client.resumeSession(session).catch(() => undefined).finally(() => setBusy(false));
   }, [client]);
 
+  // Return success so the readiness checkbox can undo its optimistic display on rejection.
   const run = async (action: () => Promise<void>): Promise<boolean> => {
     setBusy(true);
     setActionError(null);
@@ -100,7 +104,7 @@ export function PlayerLobby() {
       : <section className="altc4-card altc4-setup-card">
         <span className="altc4-kicker">JOIN A ROOM</span>
         <h1>Pair with your host</h1>
-        <p>Enter the six-character code from the host station. The server assigns your private role after both players join.</p>
+        <p>Enter the six-character code from the host station. The server assigns your private role when you join.</p>
         {busy && <ConnectionNotice status={view.status} resumed={view.resumed} />}
         <label className="altc4-field"><span>Your display name</span><input autoComplete="nickname" maxLength={200} value={displayName} onChange={(event) => setDisplayName(event.target.value)} placeholder="Name shown in the room" /></label>
         <label className="altc4-field"><span>Room code</span><input autoCapitalize="characters" maxLength={6} value={joinCode} onChange={(event) => setJoinCode(event.target.value.toUpperCase())} placeholder="ABC234" /></label>
@@ -112,6 +116,7 @@ export function PlayerLobby() {
   </main>;
 }
 
+// Render host settings, participant readiness, invitations, and the server’s start gate.
 function HostRoom({
   state, roleView, status, resumed, client, draftConfig, setDraftConfig, busy, run,
 }: {
@@ -142,14 +147,16 @@ function HostRoom({
         <div className="altc4-start-row"><div><b>{state.canStart ? 'Ready to start' : startStatusTitle(state.startBlockedReason)}</b><small>{startStatusMessage(state.startBlockedReason)}</small></div><button className="altc4-button altc4-button-primary" disabled={busy || !state.canStart} onClick={() => void run(() => client.startRound())}>Start round</button></div>
       </section>
       <aside className="altc4-host-side"><section className="altc4-card altc4-share-card"><span className="altc4-kicker">INVITE PLAYERS</span><h2>Join this room</h2><span className="altc4-share-code" data-testid="join-code">{state.joinCode}</span><p>Both players use the same six-character code.</p><label className="altc4-field"><span>Player join link</span><input readOnly value={state.joinUrl} onFocus={(event) => event.currentTarget.select()} /></label></section>
-        <section className="altc4-card altc4-lobby-status-card"><span className="altc4-kicker">YOUR STATION</span><strong>{roleView?.title || 'Host'}</strong><p>Player roles are assigned automatically when both players have joined.</p><ConnectionNotice status={status} resumed={resumed} /></section></aside>
+        <section className="altc4-card altc4-lobby-status-card"><span className="altc4-kicker">YOUR STATION</span><strong>{roleView?.title || 'Host'}</strong><p>Player roles are assigned automatically as players join.</p><ConnectionNotice status={status} resumed={resumed} /></section></aside>
     </div>
   </>;
 }
 
+// Show room settings and let this participant mark readiness through the shared client.
 function PlayerRoom({ state, roleView, participantId, client, busy, run }: { state: LobbyState; roleView: LobbyView['roleView']; participantId: string | null; client: LobbyClient; busy: boolean; run: (action: () => Promise<void>) => Promise<boolean> }) {
   const self = state.participants.find((participant) => participant.participantId === participantId);
   const isReady = Boolean(self?.ready);
+  // Server broadcasts remain authoritative; the local draft gives immediate checkbox feedback.
   const [readyDraft, setReadyDraft] = useState(isReady);
   useEffect(() => setReadyDraft(isReady), [isReady]);
   return <>
@@ -159,6 +166,7 @@ function PlayerRoom({ state, roleView, participantId, client, busy, run }: { sta
   </>;
 }
 
+// Show the real assigned role after start, explicitly marking gameplay as unavailable.
 function RoleShell({ roleView, state, status, resumed }: { roleView: LobbyView['roleView']; state: LobbyState; status: LobbyView['status']; resumed: boolean }) {
   return <>
     <div className="altc4-page-heading"><div><span className="altc4-kicker">ROOM {state.joinCode} / GAMEPLAY PREVIEW</span><h1>{roleView?.title || 'Team connected'}</h1><p>The host started the room. Your team is connected.</p></div><span className="altc4-role-stamp">{roleView?.role?.toUpperCase() || 'ASSIGNED ROLE'}</span></div>
@@ -167,6 +175,7 @@ function RoleShell({ roleView, state, status, resumed }: { roleView: LobbyView['
   </>;
 }
 
+// Render the host, joined players, and remaining empty player seats.
 function ParticipantList({ state }: { state: LobbyState }) {
   const host = state.participants.find((participant) => participant.slot === 'host');
   const players = state.participants.filter((participant) => participant.slot === 'player');
@@ -177,24 +186,29 @@ function ParticipantList({ state }: { state: LobbyState }) {
   </div>;
 }
 
+// Display one participant’s name, role, connection, and player readiness.
 function ParticipantCard({ participant, slot }: { participant?: LobbyState['participants'][number]; slot: string }) {
   const roleLabels: Record<AssignedRole, string> = { host: 'Host', specHolder: 'Spec Holder', programmer: 'Programmer' };
   return <div className="altc4-participant-card"><span className={`altc4-avatar ${participant?.slot === 'host' ? 'avatar-programmer' : 'avatar-spec'}`}>{participant?.displayName.charAt(0).toUpperCase() || '·'}</span><span className="participant-copy"><b>{participant?.displayName || slot}</b><small>{participant?.role ? roleLabels[participant.role] : participant ? 'Role assigned by server' : 'Waiting to join'}</small></span><span className={`altc4-participant-status ${participant?.connection === 'connected' ? 'status-connected' : ''}`}>{participant?.connection === 'connected' ? 'CONNECTED' : participant ? participant.connection.toUpperCase() : 'OPEN'}</span>{participant?.slot === 'player' && <span className={`altc4-ready-pill ${participant.ready ? 'is-ready' : ''}`}>{participant.ready ? 'READY' : 'NOT READY'}</span>}</div>;
 }
 
+// Show the station’s connection status and optional route back to the existing menu.
 function LobbyHeader({ title, status, onExit }: { title: string; status: LobbyView['status']; onExit?: () => void }) {
   return <header className="altc4-topbar"><a className="altc4-brand" href="#lobby-home"><span className="altc4-brand-mark">C4</span><span>BOOM BANANA <small>ALT+C4 / {title.toUpperCase()}</small></span></a><div className="altc4-toolbar"><span className={`altc4-connection-chip connection-${status}`}><i />{statusLabel(status)}</span>{onExit && <button className="altc4-button altc4-button-quiet" onClick={onExit}>Return to menu</button>}</div></header>;
 }
 
+// Explain the connection state and whether this tab resumed a previous identity.
 function ConnectionNotice({ status, resumed }: { status: LobbyView['status']; resumed: boolean }) {
   return <div className={`altc4-connection-notice connection-${status}`}><span className="connection-dot" /><span><b>{statusLabel(status)}</b><small>{resumed ? 'This browser tab resumed its previous room identity.' : status === 'connected' ? 'Room updates arrive from the backend.' : status === 'reconnecting' ? 'Trying to restore this tab’s room identity…' : 'Check the backend address or wait for the connection to return.'}</small></span></div>;
 }
 
+// Present a failed action or connection error with its retry guidance.
 function ErrorNotice({ error }: { error: LobbyError | null }) {
   if (!error) return null;
   return <div className="altc4-error-notice" role="alert"><b>{errorTitle(error.code)}</b><span>{friendlyErrorMessage(error.message)}</span>{error.retryable && <small>You can try again when the connection is ready.</small>}</div>;
 }
 
+// Choose an explicit or saved backend address, mapping local Vite ports to port 3000.
 function defaultHostEndpoint(): string {
   const session = readLobbySession();
   const configured = new URLSearchParams(window.location.search).get('server');
@@ -206,6 +220,7 @@ function defaultHostEndpoint(): string {
   return localOrigin.origin;
 }
 
+// Choose the explicit or saved backend address, falling back to the player page origin.
 function defaultPlayerEndpoint(): string {
   const configured = new URLSearchParams(window.location.search).get('server');
   if (configured) return configured;
@@ -213,6 +228,7 @@ function defaultPlayerEndpoint(): string {
   return session?.endpoint || window.location.origin;
 }
 
+// Convert protocol and ordinary connection errors into the screen’s error shape.
 function asLobbyError(error: unknown): LobbyError {
   if (error && typeof error === 'object' && 'message' in error) {
     const value = error as { code?: unknown; message: unknown; retryable?: unknown; requestId?: unknown };
@@ -227,24 +243,29 @@ function asLobbyError(error: unknown): LobbyError {
   return { code: 'connection_failed', message: 'Could not complete that lobby action.', retryable: true };
 }
 
+// Count connected player seats for the host’s team indicator.
 function connectedPlayers(state: LobbyState): number {
   return state.participants.filter((participant) => participant.slot === 'player' && participant.connection === 'connected').length;
 }
 
+// Format configured seconds as whole minutes or a minutes:seconds label.
 function formatDuration(seconds: number): string {
   const minutes = Math.floor(seconds / 60);
   const remainder = seconds % 60;
   return remainder ? `${minutes}:${String(remainder).padStart(2, '0')}` : `${minutes} min`;
 }
 
+// Map a protocol language value to its readable label.
 function languageName(language: PuzzleLanguage): string {
   return languages.find((option) => option.value === language)?.label || language;
 }
 
+// Map the client connection state to the station’s visible status.
 function statusLabel(status: LobbyView['status']): string {
   return status === 'connected' ? 'Connected' : status === 'reconnecting' ? 'Reconnecting' : status === 'connecting' ? 'Connecting' : status === 'disconnected' ? 'Disconnected' : 'Ready to connect';
 }
 
+// Give protocol and local connection errors a readable heading.
 function errorTitle(code: string): string {
   const titles: Record<string, string> = {
     bad_request: 'Check the room details', unauthorized: 'This action is not available', wrong_role: 'Host permission required',
@@ -255,6 +276,7 @@ function errorTitle(code: string): string {
   return titles[code] || 'Could not complete that action';
 }
 
+// Explain known backend rejection messages, with a readable fallback.
 function friendlyErrorMessage(message: string): string {
   const messages: Record<string, string> = {
     room_full: 'This room already has two players.', room_not_found: 'No open room uses that code.',
@@ -268,6 +290,7 @@ function friendlyErrorMessage(message: string): string {
   return messages[message] || message.replaceAll('_', ' ');
 }
 
+// Summarize the server’s first start-blocking reason for the host.
 function startStatusTitle(reason: string | null): string {
   const titles: Record<string, string> = {
     host_not_connected: 'Host connection needed', two_players_required: 'Waiting for two players',
@@ -277,6 +300,7 @@ function startStatusTitle(reason: string | null): string {
   return reason ? titles[reason] || 'Waiting for the team' : 'Waiting for the team';
 }
 
+// Explain what the host is waiting for before the server permits start.
 function startStatusMessage(reason: string | null): string {
   if (reason === 'players_must_be_ready') return 'Both players need to mark themselves ready.';
   if (reason === 'players_must_be_connected') return 'Both player stations need an active connection.';

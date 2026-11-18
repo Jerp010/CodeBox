@@ -8,6 +8,14 @@ user-approved. Phase 2+ must not implement network/room logic from this document
 alone without that review. Companion Phase 1 artifacts: `progress.md` (ledger),
 mockups and the integration spike (separate deliverables).
 
+Current implementation note (November 18, 2026): Phases 1–2 are recorded in
+`phase1-2-report.md`. Sections 1–9 also describe future gameplay requirements;
+§10 identifies the implemented Phase 2 boundary. For example, the current resume
+reply returns identity, lobby state, and a role shell; remaining time, chances,
+and drafts in §4 are future recovery fields. `returnToLobby` and `leaveRoom` in
+the target lobby interface are not current `LobbyClient` methods. Review the
+provisional gameplay decisions before implementing their later phases.
+
 ## 1. Room and identity
 
 - One room = one desktop host + exactly two player slots. Game roles are state,

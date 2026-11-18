@@ -9,6 +9,7 @@ const roles: Array<{ id: MockupRole; label: string }> = [
   { id: 'programmer', label: 'Programmer' },
 ];
 
+// Render the separate static interface study with local role and display-state selectors.
 export function MockupApp({
   initialRole = 'host',
   onExit,
@@ -59,6 +60,7 @@ export function MockupApp({
   );
 }
 
+// Show the selected sample feedback state without running game logic.
 function StateNotice({ state }: { state: MockupState }) {
   const notice = {
     ready: { icon: '✓', title: 'SYSTEM READY', detail: 'Waiting for the next repair step.' },
@@ -68,10 +70,12 @@ function StateNotice({ state }: { state: MockupState }) {
   return <div className={`altc4-state altc4-state-${state}`}><span className="altc4-state-icon">{notice.icon}</span><div><strong>{notice.title}</strong><p>{notice.detail}</p></div></div>;
 }
 
+// Render a labelled sample statistic in the mock host view.
 function Stat({ label, value, tone = '' }: { label: string; value: string; tone?: string }) {
   return <div className={`altc4-stat ${tone}`}><span>{label}</span><strong>{value}</strong></div>;
 }
 
+// Preview the shared bomb workbench using fixed sample progress, time, and chances.
 function HostMockup({ state }: { state: MockupState }) {
   return <>
     <div className="altc4-page-heading"><div><span className="altc4-kicker">CONTROL DESK / ROOM 7K2</span><h1>Bomb workbench</h1><p>Shared round overview for the host station.</p></div><span className="altc4-round-tag">ROUND 01 · MOCKUP</span></div>
@@ -90,6 +94,7 @@ function HostMockup({ state }: { state: MockupState }) {
   </>;
 }
 
+// Preview the private manual and local checklist using fixed sample instructions.
 function SpecHolderMockup({ state }: { state: MockupState }) {
   return <>
     <div className="altc4-page-heading"><div><span className="altc4-kicker">FIELD MANUAL / ROOM 7K2</span><h1>Read the repair card</h1><p>Give your teammate the clue. They have the code panel.</p></div><span className="altc4-role-stamp spec-stamp">SPEC HOLDER</span></div>
@@ -98,6 +103,7 @@ function SpecHolderMockup({ state }: { state: MockupState }) {
   </>;
 }
 
+// Preview locked code and a disabled check control using a fixed sample puzzle.
 function ProgrammerMockup({ state }: { state: MockupState }) {
   return <>
     <div className="altc4-page-heading"><div><span className="altc4-kicker">REPAIR CONSOLE / ROOM 7K2</span><h1>Patch the broken loop</h1><p>Your Spec Holder has the repair card. Talk through the fix together.</p></div><span className="altc4-role-stamp programmer-stamp">PROGRAMMER</span></div>

@@ -67,6 +67,7 @@ const DEFAULT_CONFIG: LobbyConfig = { durationSec: 300, panelCount: 3, language:
 const MAX_DISPLAY_NAME = 200;
 
 export class LobbyError extends Error {
+  // Carry a protocol error code and retry policy from the registry to the transport.
   constructor(readonly code: string, message: string, readonly retryable = false) {
     super(message);
     this.name = 'LobbyError';
@@ -81,14 +82,17 @@ export class LobbyRegistry<SocketRef = unknown> {
   private readonly sockets = new Map<string, SocketRef>();
   private readonly factories: LobbyFactories;
 
+  // Accept identity/randomness factories so room rules stay independent of WebSockets.
   constructor(factories: LobbyFactories) {
     this.factories = factories;
   }
 
+  // Use the actual listening address for links created after an ephemeral-port startup.
   setBaseUrl(baseUrl: string): void {
     this.factories.baseUrl = baseUrl;
   }
 
+  // Create a lobby and host identity, returning the host’s credential privately.
   createRoom(displayName: unknown): PrivateParticipant {
     const name = validateName(displayName);
     const maxRooms = this.factories.maxRooms ?? 500;
@@ -113,6 +117,7 @@ export class LobbyRegistry<SocketRef = unknown> {
     return { roomId, joinCode, joinUrl, participantId: host.participantId, resumeToken, role: 'host', lobbyState: this.state(room) };
   }
 
+  // Fill a player seat and assign the role complementary to the first player.
   joinRoom(joinCode: unknown, displayName: unknown): PrivateParticipant {
     if (typeof joinCode !== 'string' || !/^[A-Z2-9]{6}$/.test(joinCode)) {
       throw new LobbyError('bad_request', 'invalid_join_code');
@@ -144,6 +149,7 @@ export class LobbyRegistry<SocketRef = unknown> {
     };
   }
 
+  // Rotate a valid credential and return the old socket for the transport to displace.
   resume(token: unknown): { participant: PrivateParticipant; displacedSocket?: SocketRef } {
     if (typeof token !== 'string' || token.length < 32 || token.length > 128) {
       throw new LobbyError('invalid_resume_token', 'invalid_resume_token');
@@ -157,6 +163,7 @@ export class LobbyRegistry<SocketRef = unknown> {
       throw new LobbyError('invalid_resume_token', 'invalid_resume_token');
     }
     const displacedSocket = this.sockets.get(participant.participantId);
+    // Removing ownership now makes a delayed close from the old socket harmless.
     this.sockets.delete(participant.participantId);
     this.tokens.delete(token);
     const resumeToken = this.issueToken(room.roomId, participant.participantId);
@@ -173,15 +180,18 @@ export class LobbyRegistry<SocketRef = unknown> {
     return { participant: privateParticipant, displacedSocket };
   }
 
+  // Associate a known participant with the socket that now owns that identity.
   bindSocket(participantId: string, socket: SocketRef): void {
     if (!this.findParticipant(participantId)) throw new LobbyError('unauthorized', 'session_not_found');
     this.sockets.set(participantId, socket);
   }
 
+  // Check ownership so a superseded socket cannot act or receive room broadcasts.
   isCurrentSocket(participantId: string, socket: SocketRef): boolean {
     return this.sockets.get(participantId) === socket;
   }
 
+  // Mark the current socket’s participant offline without disconnecting its replacement.
   disconnect(participantId: string, socket: SocketRef): LobbyState | null {
     if (this.sockets.get(participantId) !== socket) return null;
     this.sockets.delete(participantId);
@@ -191,6 +201,7 @@ export class LobbyRegistry<SocketRef = unknown> {
     return this.state(found.room);
   }
 
+  // Update the public connection indicator used by the transport’s heartbeat checks.
   setConnection(participantId: string, connection: Connection): LobbyState | null {
     const found = this.findParticipant(participantId);
     if (!found) return null;
@@ -198,6 +209,7 @@ export class LobbyRegistry<SocketRef = unknown> {
     return this.state(found.room);
   }
 
+  // Validate host settings and clear player readiness only when settings change.
   setConfig(participantId: string, patch: unknown): LobbyState {
     const { room, participant } = this.requireBoundParticipant(participantId);
     if (participant.slot !== 'host') throw new LobbyError('wrong_role', 'host_only_action');
@@ -235,6 +247,7 @@ export class LobbyRegistry<SocketRef = unknown> {
     return this.state(room);
   }
 
+  // Update one participant’s readiness while the room is still in the lobby.
   setReady(participantId: string, ready: unknown): LobbyState {
     const { room, participant } = this.requireBoundParticipant(participantId);
     if (room.phase !== 'lobby') throw new LobbyError('not_joinable', 'room_not_in_lobby');
@@ -243,6 +256,7 @@ export class LobbyRegistry<SocketRef = unknown> {
     return this.state(room);
   }
 
+  // Apply the host start gate once and open the Phase 2 role shells for a new round.
   startRound(participantId: string): LobbyState {
     const { room, participant } = this.requireBoundParticipant(participantId);
     if (participant.slot !== 'host') throw new LobbyError('wrong_role', 'host_only_action');
@@ -253,22 +267,26 @@ export class LobbyRegistry<SocketRef = unknown> {
     return this.state(room);
   }
 
+  // Return a copied public snapshot, excluding credentials and socket references.
   getState(roomId: string): LobbyState | null {
     const room = this.rooms.get(roomId);
     return room ? this.state(room) : null;
   }
 
+  // Resolve a join code to its public room snapshot.
   getRoomForCode(joinCode: string): LobbyState | null {
     const roomId = this.roomByCode.get(joinCode);
     return roomId ? this.getState(roomId) : null;
   }
 
+  // Require a known participant; the transport separately verifies socket ownership.
   private requireBoundParticipant(participantId: string): { room: Room; participant: Participant } {
     const found = this.findParticipant(participantId);
     if (!found) throw new LobbyError('unauthorized', 'session_not_bound');
     return found;
   }
 
+  // Find a participant and its owning room within this bounded in-memory registry.
   private findParticipant(participantId: string): { room: Room; participant: Participant } | null {
     for (const room of this.rooms.values()) {
       const participant = room.participants.find((p) => p.participantId === participantId);
@@ -277,11 +295,12 @@ export class LobbyRegistry<SocketRef = unknown> {
     return null;
   }
 
+  // Copy public room data and derive start eligibility from the first blocking rule.
   private state(room: Room): LobbyState {
+    // Callers receive copies so rendering or transport code cannot mutate registry state.
     const participants = room.participants.map((p) => ({ ...p }));
     const players = participants.filter((p) => p.slot === 'player');
     const host = participants.find((p) => p.slot === 'host');
-    const canStart = room.phase === 'lobby' && host?.connection === 'connected' && players.length === 2 && players.every((p) => p.connection === 'connected' && p.ready);
     let startBlockedReason: string | null = null;
     if (room.phase !== 'lobby') startBlockedReason = 'round_already_started';
     else if (host?.connection !== 'connected') startBlockedReason = 'host_not_connected';
@@ -295,12 +314,13 @@ export class LobbyRegistry<SocketRef = unknown> {
       phase: room.phase,
       participants,
       config: { ...room.config },
-      canStart,
+      canStart: startBlockedReason === null,
       startBlockedReason,
       round: room.roundNo ? { roundNo: room.roundNo, outcome: null } : null,
     };
   }
 
+  // Allocate a unique participant identity with connected, unready defaults.
   private newParticipant(displayName: string, slot: Slot, role: Role | null): Participant {
     for (let i = 0; i < 10; i += 1) {
       const participantId = this.factories.participantId();
@@ -311,6 +331,7 @@ export class LobbyRegistry<SocketRef = unknown> {
     throw new LobbyError('not_joinable', 'participant_id_generation_failed', true);
   }
 
+  // Store a unique private resume credential for a participant.
   private issueToken(roomId: string, participantId: string): string {
     for (let i = 0; i < 10; i += 1) {
       const token = this.factories.resumeToken();
@@ -322,6 +343,7 @@ export class LobbyRegistry<SocketRef = unknown> {
     throw new LobbyError('not_joinable', 'token_generation_failed', true);
   }
 
+  // Allocate a room ID with bounded retries for collisions or invalid factory output.
   private uniqueRoomId(): string {
     for (let i = 0; i < 10; i += 1) {
       const id = this.factories.roomId();
@@ -330,6 +352,7 @@ export class LobbyRegistry<SocketRef = unknown> {
     throw new LobbyError('not_joinable', 'room_id_generation_failed', true);
   }
 
+  // Allocate a valid unused join code with bounded retries.
   private uniqueJoinCode(): string {
     for (let i = 0; i < 20; i += 1) {
       const code = this.factories.joinCode();
@@ -339,6 +362,7 @@ export class LobbyRegistry<SocketRef = unknown> {
   }
 }
 
+// Trim a display name and reject empty, oversized, or control-character input.
 function validateName(value: unknown): string {
   if (typeof value !== 'string') throw new LobbyError('bad_request', 'display_name_required');
   const name = value.trim();

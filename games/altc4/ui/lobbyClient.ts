@@ -5,9 +5,9 @@ const REQUEST_TIMEOUT_MS = 8_000;
 const RECONNECT_DELAY_MS = 700;
 const HEARTBEAT_INTERVAL_MS = 10_000;
 
-type HandshakeType = 'create_room' | 'join' | 'resume';
-type PendingRequest = { resolve: (payload: Record<string, unknown>) => void; reject: (error: LobbyError) => void; timeout: number };
+type PendingRequest = { resolve: () => void; reject: (error: LobbyError) => void; timeout: number };
 
+// Validate the backend HTTP(S) address and remove query, fragment, and trailing slash.
 export function normalizeBackendBase(value: string): string {
   const parsed = new URL(value.trim());
   if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
@@ -20,6 +20,7 @@ export function normalizeBackendBase(value: string): string {
   return parsed.toString().replace(/\/$/, '');
 }
 
+// Map the backend address to its WS(S) endpoint at /ws.
 export function websocketUrlForBackend(value: string): string {
   const parsed = new URL(normalizeBackendBase(value));
   parsed.protocol = parsed.protocol === 'https:' ? 'wss:' : 'ws:';
@@ -27,6 +28,7 @@ export function websocketUrlForBackend(value: string): string {
   return parsed.toString();
 }
 
+// Read this tab’s saved identity, tolerating unavailable storage or invalid JSON.
 export function readLobbySession(): LobbySession | null {
   try {
     const value = sessionStorage.getItem(LOBBY_SESSION_KEY);
@@ -59,12 +61,14 @@ export class LobbyClient {
   private pending = new Map<string, PendingRequest>();
   private requestSequence = 0;
 
+  // Publish the current view immediately and return a listener cleanup for React.
   subscribe(listener: (view: LobbyView) => void): () => void {
     this.listeners.add(listener);
     listener(this.snapshot());
     return () => this.listeners.delete(listener);
   }
 
+  // Connect as a new host and request a room with a private resume credential.
   async createRoom(endpoint: string, displayName: string): Promise<void> {
     this.endpoint = normalizeBackendBase(endpoint);
     this.displayName = displayName.trim();
@@ -73,6 +77,7 @@ export class LobbyClient {
     await this.request('create_room', { displayName: this.displayName }, true);
   }
 
+  // Connect as a new player using the host’s join code.
   async joinRoom(endpoint: string, joinCode: string, displayName: string): Promise<void> {
     this.endpoint = normalizeBackendBase(endpoint);
     this.displayName = displayName.trim();
@@ -81,6 +86,7 @@ export class LobbyClient {
     await this.request('join', { joinCode: joinCode.trim().toUpperCase(), displayName: this.displayName }, true);
   }
 
+  // Reconnect with this tab’s saved credential to restore its participant identity.
   async resumeSession(session: LobbySession): Promise<void> {
     this.endpoint = normalizeBackendBase(session.endpoint);
     this.displayName = session.displayName;
@@ -90,18 +96,22 @@ export class LobbyClient {
     await this.request('resume', { resumeToken: this.resumeToken }, true);
   }
 
+  // Request host settings; the server validates permissions and resets readiness.
   async setConfig(patch: Partial<LobbyState['config']>): Promise<void> {
     await this.request('set_config', patch);
   }
 
+  // Request a readiness change for the authenticated participant.
   async setReady(ready: boolean): Promise<void> {
     await this.request('set_ready', { ready });
   }
 
+  // Ask the server to apply its start gate and enter the assigned role shell.
   async startRound(): Promise<void> {
     await this.request('start_round', {});
   }
 
+  // Stop reconnect/heartbeat work and reject requests when the owning screen unmounts.
   stop(): void {
     this.stopped = true;
     if (this.reconnectTimer !== null) window.clearTimeout(this.reconnectTimer);
@@ -117,26 +127,31 @@ export class LobbyClient {
     this.pending.clear();
   }
 
+  // Expose the current rendering state without including the private resume credential.
   private snapshot(): LobbyView {
     return { state: this.state, roleView: this.roleView, participantId: this.participantId, status: this.status, error: this.error, resumed: this.resumed };
   }
 
+  // Notify every screen subscribed to this client’s current view.
   private publish(): void {
     const value = this.snapshot();
     for (const listener of this.listeners) listener(value);
   }
 
+  // Update the connection indicator and publish it to subscribers.
   private setStatus(status: LobbyView['status']): void {
     this.status = status;
     this.publish();
   }
 
+  // Replace the previous socket and attach connection, message, and reconnect handlers.
   private async openSocket(): Promise<void> {
     this.error = null;
     this.setStatus(this.reconnecting ? 'reconnecting' : 'connecting');
     return await new Promise((resolve, reject) => {
       const previous = this.socket;
       if (previous && previous.readyState !== WebSocket.CLOSED) {
+        // Old socket callbacks must not overwrite the replacement connection’s state.
         previous.onopen = null;
         previous.onmessage = null;
         previous.onerror = null;
@@ -184,6 +199,7 @@ export class LobbyClient {
     });
   }
 
+  // Keep the bound identity active even when the player makes no lobby changes.
   private startHeartbeat(): void {
     if (this.heartbeatTimer !== null) window.clearInterval(this.heartbeatTimer);
     this.heartbeatTimer = window.setInterval(() => {
@@ -193,6 +209,7 @@ export class LobbyClient {
     }, HEARTBEAT_INTERVAL_MS);
   }
 
+  // Retry identity resume after a disconnect without replaying lobby mutations.
   private scheduleReconnect(): void {
     if (this.reconnectTimer !== null) return;
     this.reconnectTimer = window.setTimeout(async () => {
@@ -200,6 +217,7 @@ export class LobbyClient {
       if (this.stopped || !this.resumeToken) return;
       this.reconnecting = true;
       try {
+        // Resume current state only; an earlier mutation may already have reached the server.
         await this.openSocket();
         await this.request('resume', { resumeToken: this.resumeToken }, true);
       } catch {
@@ -210,6 +228,7 @@ export class LobbyClient {
     }, RECONNECT_DELAY_MS);
   }
 
+  // Send one correlated request and wait for its reply or timeout; never auto-retry it.
   private async request(type: string, payload: Record<string, unknown>, handshake = false): Promise<void> {
     const socket = this.socket;
     if (!socket || socket.readyState !== WebSocket.OPEN) {
@@ -230,7 +249,7 @@ export class LobbyClient {
         reject({ code: 'request_timeout', message: 'The server did not reply in time. Try again.', retryable: true });
       }, REQUEST_TIMEOUT_MS);
       this.pending.set(id, {
-        resolve: () => resolve(),
+        resolve,
         reject,
         timeout,
       });
@@ -239,6 +258,7 @@ export class LobbyClient {
     await promise;
   }
 
+  // Settle correlated requests and update room, role, and privately stored identity state.
   private handleMessage(data: string): void {
     let envelope: Envelope<Record<string, unknown>>;
     try {
@@ -285,9 +305,10 @@ export class LobbyClient {
     if (pending) {
       window.clearTimeout(pending.timeout);
       this.pending.delete(correlationId);
-      pending.resolve(payload);
+      pending.resolve();
     }
 
+    // Handshakes/start nest the snapshot; lobby broadcasts put it directly in the payload.
     const nestedState = payload.lobbyState;
     const stateCandidate = nestedState && typeof nestedState === 'object' ? nestedState as LobbyState : payload as unknown as LobbyState;
     if (stateCandidate && typeof stateCandidate.roomId === 'string' && Array.isArray(stateCandidate.participants)) {
@@ -309,6 +330,7 @@ export class LobbyClient {
     this.publish();
   }
 
+  // Save the rotated credential in this tab and report when storage is unavailable.
   private storeSession(): void {
     try {
       sessionStorage.setItem(LOBBY_SESSION_KEY, JSON.stringify({
@@ -323,11 +345,13 @@ export class LobbyClient {
     }
   }
 
+  // Forget an invalid credential so reconnect attempts cannot keep using it.
   private clearSession(): void {
     this.resumeToken = '';
     try { sessionStorage.removeItem(LOBBY_SESSION_KEY); } catch {}
   }
 
+  // Generate request IDs on plain HTTP LAN pages where randomUUID may be unavailable.
   private nextRequestId(): string {
     this.requestSequence += 1;
     const bytes = new Uint8Array(16);
@@ -336,6 +360,7 @@ export class LobbyClient {
     } else {
       return `lobby-${Date.now().toString(36)}-${this.requestSequence.toString(36)}`;
     }
+    // Set the UUID v4 version and variant bits without depending on randomUUID.
     bytes[6] = (bytes[6] & 0x0f) | 0x40;
     bytes[8] = (bytes[8] & 0x3f) | 0x80;
     const hex = Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join('');

@@ -13,6 +13,7 @@ const MAX_REQUEST_CACHE = 128;
 const MAX_CONNECTIONS = 200;
 const JOIN_CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 
+// Create the room registry with server-generated identities, secrets, and random roles.
 function makeRegistry(baseUrl, maxRooms) {
   return new LobbyRegistry({
     roomId: () => crypto.randomUUID(),
@@ -25,6 +26,7 @@ function makeRegistry(baseUrl, maxRooms) {
   });
 }
 
+// Describe the assigned station without pretending Phase 2 has puzzle content.
 function roleView(role) {
   const views = {
     host: { title: 'Host', instructions: ['You control the lobby and start the round.', 'The game puzzles are not implemented yet.'] },
@@ -34,6 +36,7 @@ function roleView(role) {
   return { role, ...views[role] };
 }
 
+// Build the HTTP/WebSocket backend without listening until the caller starts it.
 function createServer(options = {}) {
   const app = express();
   const playerDist = options.playerDist || path.resolve(__dirname, '..', 'apps', 'player', 'dist');
@@ -78,36 +81,36 @@ function createServer(options = {}) {
     wss.handleUpgrade(request, socket, head, (ws) => wss.emit('connection', ws, request));
   });
 
+  // Send only to an open socket; a concurrent close needs no further reply.
   function safeSend(ws, message) {
     if (ws.readyState !== WebSocket.OPEN) return;
     try { ws.send(JSON.stringify(message)); } catch { /* socket may close between the state check and send */ }
   }
 
+  // Wrap replies and broadcasts in the shared versioned room/round envelope.
   function responseEnvelope(type, payload, state, id) {
     return { v: 1, id, type, roomId: state?.roomId || '', roundNo: state?.round?.roundNo || 0, payload };
   }
 
-  function publicMessage(type, state, recipient, requestId) {
-    const person = state.participants.find((p) => p.participantId === recipient.participantId);
-    const payload = { ...state, roleView: roleView(person?.role || 'host') };
-    if (requestId) payload.requestId = requestId;
-    return responseEnvelope(type, payload, state, requestId || crypto.randomUUID());
-  }
-
+  // Send one public room snapshot with a separate role view for each current socket.
   function broadcastRoom(roomId) {
+    const state = registry.getState(roomId);
+    if (!state) return;
     for (const connection of connections) {
       if (connection.bound?.roomId !== roomId || !registry.isCurrentSocket(connection.bound.participantId, connection.ws)) continue;
-      const state = registry.getState(roomId);
-      if (state) safeSend(connection.ws, publicMessage('lobby_state', state, connection.bound));
+      const payload = { ...state, roleView: roleViewFor(state, connection.bound.participantId) };
+      safeSend(connection.ws, responseEnvelope('lobby_state', payload, state, crypto.randomUUID()));
     }
   }
 
+  // Send a correlated action reply and remember it for same-socket retries.
   function sendReply(connection, envelope, type, payload, state) {
     const response = responseEnvelope(type, { ...payload, requestId: envelope.id }, state, envelope.id);
     safeSend(connection.ws, response);
     cacheResponse(connection, envelope, response);
   }
 
+  // Send a typed rejection, caching it when a request ID is available.
   function sendError(connection, envelope, code, message, retryable = false) {
     const state = connection.bound ? registry.getState(connection.bound.roomId) : null;
     const response = responseEnvelope('error', { code, message, retryable, requestId: envelope?.id || undefined }, state, envelope?.id || crypto.randomUUID());
@@ -115,21 +118,26 @@ function createServer(options = {}) {
     if (envelope?.id) cacheResponse(connection, envelope, response);
   }
 
+  // Keep the last 128 request fingerprints and replies on this socket only.
   function cacheResponse(connection, envelope, response) {
     if (!envelope?.id || connection.cache.has(envelope.id)) return;
     connection.cache.set(envelope.id, { fingerprint: JSON.stringify(envelope), response });
+    // shortcut: retries cover this socket’s last 128 IDs; Phase 4 needs a round submission ledger.
     while (connection.cache.size > MAX_REQUEST_CACHE) connection.cache.delete(connection.cache.keys().next().value);
   }
 
+  // Translate registry errors into protocol errors without exposing internal exceptions.
   function fail(connection, envelope, error) {
     if (error instanceof LobbyError) return sendError(connection, envelope, error.code, error.message, error.retryable);
     return sendError(connection, envelope, 'bad_request', 'invalid_request');
   }
 
+  // Reject extra action fields before they reach the room registry.
   function assertPayloadKeys(payload, allowed) {
     if (Object.keys(payload).some((key) => !allowed.includes(key))) throw new LobbyError('bad_request', 'unexpected_payload_field');
   }
 
+  // Verify socket ownership, room identity, and round freshness before an action.
   function boundState(connection, envelope) {
     const bound = connection.bound;
     if (!bound) throw new LobbyError('unauthorized', 'handshake_required');
@@ -141,6 +149,7 @@ function createServer(options = {}) {
     return state;
   }
 
+  // Count every incoming frame, including retries, against the rolling rate limit.
   function takeRateSlot(connection) {
     const now = Date.now();
     connection.messageTimes = connection.messageTimes.filter((timestamp) => now - timestamp < 1000);
@@ -149,6 +158,7 @@ function createServer(options = {}) {
     return true;
   }
 
+  // Bind the authenticated socket and privately return its credential and room state.
   function sendHandshake(connection, envelope, kind, participant) {
     const state = participant.lobbyState;
     const payload = {
@@ -167,6 +177,7 @@ function createServer(options = {}) {
     sendReply(connection, envelope, kind, payload, state);
   }
 
+  // Validate a frame, handle cached retries, then dispatch the permitted lobby action.
   function handleMessage(connection, data, isBinary) {
     const withinRate = takeRateSlot(connection);
     if (data.length > MAX_FRAME_BYTES) {
@@ -178,7 +189,16 @@ function createServer(options = {}) {
     try {
       if (isBinary) throw new LobbyError('bad_request', 'text_frames_required');
       envelope = JSON.parse(data.toString('utf8'));
-      if (!envelope || typeof envelope !== 'object' || Array.isArray(envelope) || Object.keys(envelope).some((key) => !['v', 'id', 'type', 'roomId', 'roundNo', 'payload'].includes(key)) || envelope.v !== 1 || typeof envelope.id !== 'string' || !/^[\w.-]{1,128}$/.test(envelope.id) || typeof envelope.type !== 'string' || typeof envelope.roomId !== 'string' || !Number.isInteger(envelope.roundNo) || envelope.roundNo < 0 || !Object.hasOwn(envelope, 'payload') || !envelope.payload || typeof envelope.payload !== 'object' || Array.isArray(envelope.payload)) {
+      if (
+        !envelope || typeof envelope !== 'object' || Array.isArray(envelope) ||
+        Object.keys(envelope).some((key) => !['v', 'id', 'type', 'roomId', 'roundNo', 'payload'].includes(key)) ||
+        envelope.v !== 1 ||
+        typeof envelope.id !== 'string' || !/^[\w.-]{1,128}$/.test(envelope.id) ||
+        typeof envelope.type !== 'string' || typeof envelope.roomId !== 'string' ||
+        !Number.isInteger(envelope.roundNo) || envelope.roundNo < 0 ||
+        !Object.hasOwn(envelope, 'payload') || !envelope.payload ||
+        typeof envelope.payload !== 'object' || Array.isArray(envelope.payload)
+      ) {
         throw new LobbyError('bad_request', 'invalid_envelope');
       }
     } catch (error) {
@@ -227,6 +247,7 @@ function createServer(options = {}) {
         }
         assertPayloadKeys(envelope.payload, ['resumeToken']);
         const resumed = registry.resume(envelope.payload.resumeToken);
+        // The registry has revoked old ownership, so a delayed close cannot disconnect the replacement.
         if (resumed.displacedSocket && resumed.displacedSocket !== connection.ws) {
           safeSend(resumed.displacedSocket, responseEnvelope('error', { code: 'unauthorized', message: 'session_taken_over', retryable: false }, null, crypto.randomUUID()));
           resumed.displacedSocket.close(4001, 'session taken over');
@@ -271,11 +292,13 @@ function createServer(options = {}) {
     }
   }
 
+  // Select the recipient’s own station description for both replies and broadcasts.
   function roleViewFor(state, participantId) {
     const participant = state.participants.find((p) => p.participantId === participantId);
     return roleView(participant?.role || 'host');
   }
 
+  // Unauthenticated sockets have one absolute deadline, even after rejected requests.
   wss.on('connection', (ws) => {
     const connection = { ws, bound: null, cache: new Map(), messageTimes: [], lastMessageAt: Date.now(), lastPingAt: 0 };
     if (connections.size >= maxConnections) {
@@ -299,6 +322,7 @@ function createServer(options = {}) {
     ws.on('error', () => {});
   });
 
+  // Phase 2 reports connection loss; active-round pause and recovery belong to later phases.
   heartbeatTimer = setInterval(() => {
     const now = Date.now();
     for (const connection of connections) {
@@ -320,6 +344,7 @@ function createServer(options = {}) {
   heartbeatTimer.unref?.();
 
   const originalClose = httpServer.close.bind(httpServer);
+  // Stop timers and terminate WebSockets before closing the HTTP listener.
   httpServer.close = function close(callback) {
     if (!closing) {
       closing = true;
