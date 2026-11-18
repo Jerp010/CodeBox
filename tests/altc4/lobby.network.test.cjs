@@ -2,8 +2,8 @@
  * Alt+C4 Phase 2 integration tests: room creation, joining, role assignment,
  * lobby permissions, start gating, resume safety, and room isolation.
  *
- * Expected RED until Phase 2 (server/index.js + networking) exists.
- * Contract: docs/altc4/contracts.md
+ * Build the server modules first: npm run altc4:server:build
+ * Contract: docs/altc4/README.md#current-lobby-and-protocol-contract
  *
  * Run: node --test tests/altc4/lobby.network.test.cjs
  */

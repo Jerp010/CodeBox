@@ -16,56 +16,9 @@ Use Node.js 24 LTS and npm. Install from the repository root so the checked-in r
 npm ci
 ```
 
-## Run the Alt+C4 lobby locally
+## Alt+C4 documentation
 
-Build the host/player frontends and start the shared backend:
-
-```bash
-npm run altc4:build
-npm run altc4:server:start
-```
-
-The backend listens on `http://localhost:3000` by default and serves the player app at `/`. In another terminal, start the desktop host frontend:
-
-```bash
-npm run host:dev
-```
-
-Open the Vite URL it prints, select **Open Alt+C4 host lobby**, and create a room. The host endpoint field starts at `http://localhost:3000` for the local setup. The server displays a six-character room code and join link. Both players open the link or `http://localhost:3000/?code=ROOMCODE`, enter display names, and mark themselves ready. The host can change duration, panel count, and language, then start when both players are connected and ready.
-
-For a LAN demo, set `PORT` and `ALTC4_BACKEND_BASE_URL` to an address reachable by the player devices before starting the server. For example:
-
-```bash
-PORT=3000 ALTC4_BACKEND_BASE_URL=http://192.168.1.20:3000 npm run altc4:server:start
-```
-
-Use the demo host's actual reachable address in the host endpoint field. Player pages connect to the backend that served the page. HTTPS player origins automatically use WSS for the WebSocket connection; the host endpoint field accepts HTTP or HTTPS.
-
-To run the host in the Tauri desktop shell, install the platform prerequisites for Tauri and Rust, build the frontends, start the backend separately, then run:
-
-```bash
-cd apps/host
-npx tauri dev
-```
-
-The native Tauri host has not yet been rehearsed with two physical player devices.
-
-## Mockup previews
-
-The Phase 1 static mockups remain separate from the live lobby:
-
-- Player mockups: `http://localhost:3000/?mockup=1&role=host`, `?mockup=1&role=spec-holder`, or `?mockup=1&role=programmer`.
-- Host mockup: add `?mockup=1` to the host Vite URL.
-
-They show sample artwork and checking/paused states. The controls do not run a game.
-
-## Build and verification
-
-```bash
-npm run altc4:build
-npm run altc4:verify
-```
-
-`altc4:verify` type-checks frontend and server code, builds both frontends and the CommonJS server module, checks Tailwind source inclusion, runs host lifecycle, server smoke, and backend network/adversarial/limit checks, then exercises the live lobby in isolated browser contexts. Playwright uses its installed Chromium; install it on a fresh machine with `npx playwright install chromium`.
-
-The endpoint serves only the built player app and `/health`; WebSocket messages use `/ws`. The Phase 2 implementation boundary, message contract, operational limits, and current verification notes are in [docs/altc4/backend.md](docs/altc4/backend.md) and [docs/altc4/contracts.md](docs/altc4/contracts.md).
+The [Alt+C4 project guide](docs/altc4/README.md) contains the current task status,
+source map, contracts, setup, verification history and remaining phase roadmap.
+Start with the [Phase 3 specification](docs/altc4/README.md#phase-3-specification)
+for T6 Server-Side Checking, or [run the current lobby](docs/altc4/README.md#run-and-verify).
