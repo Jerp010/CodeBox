@@ -12,7 +12,7 @@
 /** @param {unknown} typed */
 const assertTyped = (typed) => {
     if(typeof typed !== 'string') {
-        throw new Error('Invalid input: expected a string, got ${typeof typed}');
+        throw new Error(`Invalid input: expected a string, got ${typeof typed}`);
     }
 }
 
