@@ -16,7 +16,7 @@
     <title>CoDecipher Host</title>
   </head>
 
-  <body class="bg-[#F3EDDB] m-0 overflow-x-hidden">
+  <body class="m-0 overflow-hidden">
 
     <div id="app" class="relative isolate w-full min-h-screen">
       <div id="main-menu" hidden class="relative isolate w-full min-h-screen">
@@ -85,7 +85,7 @@
 
 
       <!-- TOP AREA -->
-      <div id="top-area" class="relative z-10 w-full h-[37vh]">
+      <div id="top-area" class="relative z-10 w-full h-[399px]">
 
         <div id="title" class="absolute top-17.5 right-12.5">
           <img
@@ -121,7 +121,7 @@
       <!-- GAME MODES -->
       <div
         id="gamemodes"
-        class="relative z-10 w-full h-[60vh] min-h-107.5 overflow-visible"
+        class="relative z-10 w-full h-[648px] min-h-107.5 overflow-visible"
       >
 
         <div
@@ -276,16 +276,25 @@
 
       </div>
 
-      <div id="lobby-typbyt" hidden class="relative isolate w-full min-h-screen">
+      <div id="lobby-typbyt" class="typebyte-lobby relative isolate w-full min-h-screen">
+        <aside class="typebyte-player-list" aria-label="Players">
+          <ul>
+            <li>Player 1</li>
+            <li>Player 2</li>
+            <li>Player 3</li>
+            <li>Player 4</li>
+          </ul>
+        </aside>
 
+        <span class="typebyte-room-code">ABC123</span>
       </div>
 
-    <!-- CODEBLOCK LOBBY VIEW (Frontend Only) -->
+    <!-- CODEBLOCK LOBBY -->
     <section
       id="lobby-cdblck"
-      class="codeblock-lobby relative isolate w-full min-h-screen overflow-hidden select-none bg-center bg-no-repeat bg-cover"
+      hidden class="codeblock-lobby relative isolate w-full min-h-screen overflow-hidden select-none bg-center bg-no-repeat bg-cover"
     >
-      <div class="codeblock-lobby-art absolute top-1/2 left-1/2 w-[max(100vw,177.78vh)] aspect-video -translate-x-1/2 -translate-y-1/2">
+      <div class="codeblock-lobby-art absolute top-1/2 left-1/2 w-[1920px] aspect-video -translate-x-1/2 -translate-y-1/2">
         <div class="codeblock-player-grid absolute top-[32%] right-[5%] w-[60%] h-[60%] pointer-events-auto">
 
           <!-- Top/Back Row (Jeff, Anson, Lars, Jhervis) -->

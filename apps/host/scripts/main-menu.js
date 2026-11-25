@@ -31,30 +31,32 @@ function initializeMainMenu() {
 
     const ambientRect = ambient.getBoundingClientRect();
     const boxRect = box.getBoundingClientRect();
+    const scale = ambientRect.width / ambient.offsetWidth;
+    if (!Number.isFinite(scale) || scale <= 0) return;
 
     const dinoWidth = dino.offsetWidth;
     const dinoHeight = dino.offsetHeight;
 
     // Keep the dinosaur inside the background horizontally
     const minX = 24;
-    const maxX = ambientRect.width - dinoWidth - 24;
+    const maxX = ambient.offsetWidth - dinoWidth - 24;
 
     // Keep it above the folder box
     const minY = 90;
     const maxY = Math.max(
         minY,
-        boxRect.top - ambientRect.top - dinoHeight - 24
+        (boxRect.top - ambientRect.top) / scale - dinoHeight - 24
     );
 
     // Position relative to the ambient background
     const targetX = Math.max(
         minX,
-        Math.min(event.clientX - ambientRect.left - dinoWidth / 2, maxX)
+        Math.min((event.clientX - ambientRect.left) / scale - dinoWidth / 2, maxX)
     );
 
     const targetY = Math.max(
         minY,
-        Math.min(event.clientY - ambientRect.top - dinoHeight / 2, maxY)
+        Math.min((event.clientY - ambientRect.top) / scale - dinoHeight / 2, maxY)
     );
 
     dino.style.left = `${targetX}px`;

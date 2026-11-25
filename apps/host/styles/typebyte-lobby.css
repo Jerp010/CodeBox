@@ -1,0 +1,22 @@
+.typebyte-lobby {
+  background-image: url("../assets/images/typebyte-lobby-bg.png");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.typebyte-player-list,
+.typebyte-room-code {
+  position: absolute;
+  color: #fff;
+  font-family: monospace;
+}
+
+.typebyte-player-list ul {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
