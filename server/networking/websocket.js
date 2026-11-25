@@ -4,8 +4,12 @@ const { createRoom } = require("../rooms/roomManager.js");
 const { WebSocketServer } = require("ws");
 const http = require("http");
 
-/* Initialize the HTTP server */
-const server = http.createServer((req, res) => {});
+/* Creates the HTTP server */
+const server = http.createServer((req, res) => {
+  res.writeHead(200, { 'Content-Type': 'text/plain' })
+  res.write('Successfully reached host')
+  res.end()
+});
 
 /* Attach the WebSocket server to the HTTP server */
 const wss = new WebSocketServer({ server });

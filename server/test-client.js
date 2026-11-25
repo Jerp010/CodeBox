@@ -2,7 +2,7 @@
 const { WebSocket } = require('ws');
 
 /* Establish a connection to the CodeBox backend */
-const ws = new WebSocket("ws://localhost:3000");
+const ws = new WebSocket("wss://gecko-uphold-timothy.ngrok-free.dev");
 
 /* Handle successful connection to the backend */
 ws.on("open", () => {
