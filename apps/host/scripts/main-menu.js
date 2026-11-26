@@ -1,22 +1,83 @@
+const ngrokConnection = "wss://gecko-uphold-timothy.ngrok-free.dev"
+const localConnection = "ws://localhost:3000"
+
+/* Establish a connection to the CodeBox backend */
+const ws = new WebSocket(ngrokConnection);
+
 function initializeMainMenu() {
-    let mainMenuButtons = document.querySelectorAll('button'); //gets all the data mode values for buttons
+    let mainMenuButtons = document.querySelectorAll('.folder-trigger[data-mode]'); //gets all the data mode values for buttons
+    let mode = ""
+
+    ws.addEventListener("open", () => {
+        console.log("Connected to CodeBox Server");
+    });
+
+    ws.addEventListener("error", (event) => {
+        console.error("WebSocket connection error:", event);
+    });
+
+    ws.addEventListener("message", (event) => {
+        try {
+            const response = JSON.parse(event.data);
+
+            console.log("Server response:", response);
+
+            // Announces that a room has been created
+            if (response.type === "ROOM_CREATED") {
+                document.dispatchEvent(
+                    new CustomEvent("codebox:room-created", {
+                        detail: response
+                    })
+                );
+            }
+
+            if (response.type === "PLAYER_JOINED") {
+                document.dispatchEvent(
+                    new CustomEvent("codebox:player-joined", {
+                        detail: response
+                    })
+                );
+            }
+
+            if (response.type === "ROOM_ENDED") {
+                document.dispatchEvent(
+                    new CustomEvent("codebox:room-ended", {
+                        detail: response
+                    })
+                );
+            }
+            
+            if (response.type === "ROOM_END_ERROR") {
+                console.error("Failed to end room:", response.code);
+
+                document.dispatchEvent(
+                    new CustomEvent("codebox:room-end-error", {
+                        detail: response
+                    })
+                );
+            }
+
+        } catch (error) {
+            // Handle non-JSON messages, such as the welcome message
+            console.log("Server message:", event.data);
+        }
+    });
 
     // Add event listeners to each button
     mainMenuButtons.forEach(button => { 
         button.addEventListener('click', function() {
             // Get the data-mode and data-info attributes of the clicked button
             // No value or function is being returned, just logging to the console
-            let mode = button.getAttribute('data-mode');
-            let info = button.getAttribute('data-info');
-            console.log(`Button clicked: Mode = ${mode}, Info = ${info}`);
+            mode = button.getAttribute('data-mode');
+            console.log(`Button clicked: Mode = ${mode}`);
 
-            // Toggle the 'selected' class on the clicked button
-            if (!button.classList.contains('selected')) {
-                button.classList.add('selected');
-            } else {
-                button.classList.remove('selected');
-            }
-        });
+            // must be inside the button listener so it responds with all the buttons
+            if (ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({
+                    type: "CREATE_ROOM",
+                    gameMode: mode
+                }))}
+            });
     })
     
     const dino = document.querySelector("#dino-roamer");
@@ -67,6 +128,27 @@ function initializeMainMenu() {
     }
 
     previousX = targetX;
+    });
+
+    document.addEventListener("codebox:end-room-request", (event) => {
+        if (!ws || ws.readyState !== WebSocket.OPEN) {
+            console.error("Cannot end room: server connection unavailable.");
+
+            document.dispatchEvent(
+                new CustomEvent("codebox:room-end-error", {
+                    detail: { code: "SERVER_UNAVAILABLE" }
+                })
+            );
+
+            return;
+        }
+
+        console.log("Sending END_ROOM request:", event.detail.roomCode);
+
+        ws.send(JSON.stringify({
+            type: "END_ROOM",
+            roomCode: event.detail.roomCode
+        }));
     });
 
 }
