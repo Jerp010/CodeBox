@@ -1,7 +1,9 @@
 const { test } = require("node:test");
 const assert = require("node:assert/strict");
-const { createBoss, damageBoss, hasNextBoss } = require("../server/boss");
-const { BOSS_HEALTH_PER_PLAYER, MIN_PLAYER_COUNT } = require("../server/constants");
+const { createBoss, damageBoss, hasNextBoss, bossAttack } = require("../server/boss");
+const { createPlayer } = require("../server/languages");
+const { damagePlayer } = require("../server/player");
+const { BOSS_HEALTH_PER_PLAYER, MIN_PLAYER_COUNT, BOSS_ATTACK_DAMAGE, PLAYER_MAX_HEALTH } = require("../server/constants");
 
 test("createBoss scales health with player count", () => {
     const boss = createBoss(0, 4);
@@ -52,4 +54,58 @@ test("hasNextBoss is false only after the last boss", () => {
     assert.equal(hasNextBoss(0), true);
     assert.equal(hasNextBoss(1), true);
     assert.equal(hasNextBoss(2), false);
+});
+
+test("bossAttack hurts the player by BOSS_ATTACK_DAMAGE and reports it", () => {
+    const boss = createBoss(0, 2);
+    const player = createPlayer("p1", "Anson");
+    const result = bossAttack(boss, player);
+    assert.deepEqual(result, {
+        attacked: true,
+        playerId: "p1",
+        damage:   BOSS_ATTACK_DAMAGE,
+        health:   PLAYER_MAX_HEALTH - BOSS_ATTACK_DAMAGE,
+        defeated: false,
+    });
+    assert.equal(player.health, PLAYER_MAX_HEALTH - BOSS_ATTACK_DAMAGE);
+});
+
+test("bossAttack defeats a player after enough hits", () => {
+    const boss = createBoss(0, 2);
+    const player = createPlayer("p1", "Jeff");
+    let result;
+    for(let i = 0; i < PLAYER_MAX_HEALTH; i++) {
+        result = bossAttack(boss, player);
+    }
+    assert.equal(result.defeated, true); // result
+    assert.equal(player.health, 0);      // player
+    assert.equal(player.defeated, true);
+});
+
+test("bossAttack only affects the targeted player", () => {
+    const boss = createBoss(0, 2);
+    const p1   = createPlayer("p1", "Anson");
+    const p2   = createPlayer("p2", "Ansel");
+    bossAttack(boss, p1);
+    assert.equal(p2.health, PLAYER_MAX_HEALTH);
+});
+
+test("bossAttack does nothing to an already defeated player", () => {
+    const boss = createBoss(0, 2);
+    const player = createPlayer("p1", "Anson");
+    damagePlayer(player, 999);
+    const result = bossAttack(boss, player);
+    assert.equal(result.attacked, false);
+    assert.equal(result.damage, 0);
+    assert.equal(result.health, 0);
+});
+
+test("bossAttack does nothing once the boss is defeated", () => {
+    const boss = createBoss(1, 3);
+    const player = createPlayer("p2", "Marquez");
+    damageBoss(boss, 999);
+    const result = bossAttack(boss, player);
+    assert.equal(result.attacked, false);
+    assert.equal(result.damage, 0);
+    assert.equal(result.health, PLAYER_MAX_HEALTH);
 });
