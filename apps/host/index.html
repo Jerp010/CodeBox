@@ -150,116 +150,101 @@
           <!-- FOLDERS -->
           <div
             id="folder-clip"
-            class="relative overflow-hidden w-full h-250 -top-82.5 z-2"
+            class="relative overflow-visible w-full h-250 -top-82.5 z-2"
           >
 
-            <!-- TRIVIA -->
-            <div
-              id="card-trv"
-              class="gamemode-card folder-card folder-trv"
-            >
-              <img
-                id="trv"
-                src="./assets/images/trv.png"
-                alt="Trivia"
-                class="w-full h-full object-contain"
-              >
+            <!-- TRIVIA: visual placeholder, not yet supported -->
+            <div id="card-trv" class="gamemode-card folder-card folder-trv">
+              <img src="./assets/images/trv.png" alt="Trivia" class="w-full h-full object-contain">
             </div>
 
-            <!-- IMPOSTOR -->
-            <div
-              id="card-impstr"
-              class="gamemode-card folder-card folder-impstr"
-            >
-              <img
-                id="impstr"
-                src="./assets/images/impstr.png"
-                alt="Impostor"
-                class="w-full h-full object-contain"
-              >
+            <!-- IMPOSTOR: visual placeholder, not yet supported -->
+            <div id="card-impstr" class="gamemode-card folder-card folder-impstr">
+              <img src="./assets/images/impstr.png" alt="Impostor" class="w-full h-full object-contain">
             </div>
 
-            <!-- SQL DETECTIVE -->
-            <div
-              id="card-sqldtctv"
-              class="gamemode-card folder-card folder-sqldtctv"
-            >
-              <img
-                id="sqldtctv"
-                src="./assets/images/sqldtctv.png"
-                alt="SQL Detective"
-                class="w-full h-full object-contain"
-              >
+            <!-- SQL DETECTIVE: visual placeholder, not yet supported -->
+            <div id="card-sqldtctv" class="gamemode-card folder-card folder-sqldtctv">
+              <img src="./assets/images/sqldtctv.png" alt="SQL Detective" class="w-full h-full object-contain">
             </div>
 
-            <!-- ALT+C4 -->
-            <button
-              data-mode="altc4"
-              data-info="altc4-info"
+            <!-- Alt+C4 -->
+            <div
               id="card-altc4"
-              type="button"
               class="gamemode-card folder-card folder-altc4"
+              data-mode="AltC4"
             >
-              <img
-                id="altc4-unselected"
-                src="./assets/images/alt+c4 - unselected.png"
-                alt="Alt+C4"
-                class="folder-unselected absolute inset-0 w-full h-full object-contain"
+              <button
+                type="button"
+                class="folder-trigger"
+                data-mode="AltC4"
+                aria-label="Create an Alt+C4 room"
               >
+                <img
+                  src="./assets/images/alt+c4 - unselected.png"
+                  alt=""
+                  class="folder-unselected"
+                >
 
-              <img
-                id="altc4-selected"
-                src="./assets/images/alt+c4 - selected.png"
-                alt="Alt+C4 Information"
-                class="folder-selected absolute inset-0 w-full h-full object-contain hidden"
-              >
-            </button>
+                <img
+                  src="./assets/images/alt+c4 - selected.png"
+                  alt="Alt+C4 game mode details"
+                  class="folder-selected"
+                >
+              </button>
+            </div>
 
-            <!-- CODEBLOCK -->
-            <button
-              data-mode="cdblck"
-              data-info="cdblck-info"
+            <!-- CodeBlock -->
+            <div
               id="card-cdblck"
-              type="button"
               class="gamemode-card folder-card folder-cdblck"
+              data-mode="CodeBlock"
             >
-              <img
-                id="cdblck-unselected"
-                src="./assets/images/codeblock - unselected.png"
-                alt="CodeBlock"
-                class="folder-unselected absolute inset-0 w-full h-full object-contain"
+              <button
+                type="button"
+                class="folder-trigger"
+                data-mode="CodeBlock"
+                aria-label="Create a CodeBlock room"
               >
+                <img
+                  src="./assets/images/codeblock - unselected.png"
+                  alt=""
+                  class="folder-unselected"
+                >
 
-              <img
-                id="cdblck-selected"
-                src="./assets/images/codeblock - selected.png"
-                alt="CodeBlock Information"
-                class="folder-selected absolute inset-0 w-full h-full object-contain hidden"
-              >
-            </button>
+                <img
+                  src="./assets/images/codeblock - selected.png"
+                  alt="CodeBlock game mode details"
+                  class="folder-selected"
+                >
+              </button>
+            </div>
 
-            <!-- TYPEBYTE -->
-            <button
-              data-mode="typbyt"
-              data-info="typbyt-info"
+            <!-- TypeByte -->
+            <div
               id="card-typbyt"
-              type="button"
               class="gamemode-card folder-card folder-typbyt"
+              data-mode="TypeByte"
             >
-              <img
-                id="typbyt-unselected"
-                src="./assets/images/typebyte - unselected.png"
-                alt="TypeByte"
-                class="folder-unselected absolute inset-0 w-full h-full object-contain"
+              <button
+                type="button"
+                class="folder-trigger"
+                data-mode="TypeByte"
+                aria-label="Create a TypeByte room"
               >
+                <img
+                  src="./assets/images/typebyte - unselected.png"
+                  alt=""
+                  class="folder-unselected"
+                >
 
-              <img
-                id="typbyt-selected"
-                src="./assets/images/typebyte - selected.png"
-                alt="TypeByte Information"
-                class="folder-selected absolute inset-0 w-full h-full object-contain hidden"
-              >
-            </button>
+                <img
+                  src="./assets/images/typebyte - selected.png"
+                  alt="TypeByte game mode details"
+                  class="folder-selected"
+                >
+              </button>
+            </div>
 
           </div>
 
@@ -279,7 +264,91 @@
         </div>
       </div>
 
+      <div id="room-creation-status" role="status" aria-live="polite" hidden></div>
       </div>
+
+      <!-- TEMPORARY GENERIC LOBBY -->
+      <section id="lobby-placeholder" hidden>
+
+          <header class="placeholder-header">
+              <h1>CODEBOX</h1>
+              <span>HOST SESSION</span>
+              <button id="end-session-button" type="button">
+                  END SESSION
+              </button>
+          </header>
+
+          <main class="placeholder-main">
+
+              <h2>Waiting Room</h2>
+              <p class="placeholder-subtitle">
+                  Your room has been created successfully.
+              </p>
+
+              <!-- ROOM INFORMATION -->
+              <div class="placeholder-room-info">
+
+                  <div>
+                      <span class="placeholder-label">GAME MODE</span>
+                      <h3 id="placeholder-game-mode">---</h3>
+                  </div>
+
+                  <div>
+                      <span class="placeholder-label">ROOM CODE</span>
+
+                      <div class="placeholder-code-row">
+                          <strong id="placeholder-room-code">--------</strong>
+
+                          <button id="placeholder-copy-code" type="button">
+                              COPY
+                          </button>
+                      </div>
+                  </div>
+
+                  <div>
+                      <span class="placeholder-label">ROOM STATUS</span>
+                      <p id="placeholder-room-status">OPEN</p>
+                  </div>
+
+              </div>
+
+
+              <!-- PLAYER INFORMATION -->
+              <div class="placeholder-players-heading">
+                  <h3>Players</h3>
+
+                  <span>
+                      <strong id="placeholder-player-count">0</strong>
+                      /
+                      <span id="placeholder-player-capacity">8</span>
+                  </span>
+              </div>
+
+
+              <!-- HOST -->
+              <div class="placeholder-host">
+                  <div class="placeholder-avatar">H</div>
+
+                  <div>
+                      <strong>Desktop Host</strong>
+                      <p>Room creator</p>
+                  </div>
+
+                  <span>HOST</span>
+              </div>
+
+
+              <!-- EMPTY PLAYER SLOTS -->
+              <div id="placeholder-player-slots"></div>
+
+
+              <p class="placeholder-footer" id="placeholder-footer">
+                  Waiting for players to join...
+              </p>
+
+          </main>
+
+      </section>
 
       <div id="lobby-typbyt" hidden class="relative isolate w-full min-h-screen">
 
