@@ -1,5 +1,12 @@
 @import "tailwindcss";
 
+/* for typebyte hehe */
+@import "@fontsource/jersey-10";
+@import "@fontsource/jersey-25";
+@import "@fontsource/cascadia-code";
+
+@source "../../games/typebyte/host/lobby.js"; 
+
 :root {
   font-family: Arial, sans-serif;
   font-synthesis: none;

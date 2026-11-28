@@ -67,6 +67,10 @@ function initializePlaceholderLobby() {
     document.addEventListener("codebox:room-created", (event) => {
         const room = event.detail;
 
+        if(room.gameMode === "TypeByte") {
+            return
+        }
+
         console.log("Placeholder lobby received room:", room);
 
         const gameMode = room.gameMode;
@@ -97,7 +101,10 @@ function initializePlaceholderLobby() {
         window.codeboxRoom = room;
     });
 
-        document.addEventListener("codebox:player-joined", (event) => {
+    document.addEventListener("codebox:player-joined", (event) => {
+        if(lobby.hidden) {
+            return;
+        }
         const update = event.detail;
 
         console.log("Player joined:", update);
@@ -157,6 +164,9 @@ function initializePlaceholderLobby() {
     });
 
     document.addEventListener("codebox:room-ended", () => {
+        if(lobby.hidden) {
+            return;
+        }
         console.log("Session successfully ended.");
 
         // Return to the main menu
@@ -171,6 +181,9 @@ function initializePlaceholderLobby() {
     });
 
     document.addEventListener("codebox:room-end-error", (event) => {
+        if(lobby.hidden) {
+            return;
+        }
         console.error("Room ending failed:", event.detail);
 
         endSessionButton.disabled = false;
