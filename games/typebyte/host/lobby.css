@@ -1,0 +1,26 @@
+/* Fonts (installed with npm, so they also work offline inside Tauri).
+   Install once:  npm --prefix apps/host i @fontsource/jersey-10 @fontsource/jersey-25 @fontsource/cascadia-code */
+@import "@fontsource/jersey-10";
+@import "@fontsource/jersey-25";
+@import "@fontsource/cascadia-code";
+
+/* Scale the whole lobby with the window (desktop sizes only).
+   The Figma frame is about 1453 x 1035 px = 90.8 x 64.7 rem (at 16px per rem).
+   The root font size becomes whichever is smaller: window width / 90.8 or
+   window height / 64.7. Everything in lobby.js is written in rem, so the screen
+   keeps the same proportions on any desktop. The bigger area just grows
+   (the editor stretches). :has() makes this rule apply only while the lobby is
+   on screen, so other screens keep the normal rem size. */
+html:has(#typebyte-lobby) {
+  font-size: clamp(10px, min(calc(100vw / 90.8), calc(100vh / 64.7)), 28px);
+}
+
+/* Height of one "editor line". Line numbers and code lines both use it,
+   so they stay aligned. */
+#typebyte-lobby {
+  --line: 1.325rem;
+}
+
+.tb-font-jersey10 { font-family: "Jersey 10", monospace; }
+.tb-font-jersey25 { font-family: "Jersey 25", monospace; }
+.tb-font-code     { font-family: "Cascadia Code", Consolas, "DejaVu Sans Mono", monospace; }
