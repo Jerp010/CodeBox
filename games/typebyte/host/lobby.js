@@ -1,5 +1,6 @@
 // @ts-check
 
+import { LANGUAGE_EXTENSIONS } from "../shared/languages.js";
 import "./lobby.css";
 
 // TODO(room-code): replace this static value with the real room code
@@ -10,7 +11,7 @@ const PLAYERS_EMPTY_CLASS =
     "mb-[1rem] ml-[3.7rem] mr-[2.36rem] mt-[0.5rem] grid h-[34.8rem] place-items-center rounded-[0.25rem] border border-dashed border-white/25";
 
 const PLAYERS_LIST_CLASS =
-    "mb-[1rem] ml-[3.7rem] mr-[2.36rem] mt-[0.5rem] flex h-[34.8rem] flex-col gap-[0.75rem] overflow-y-auto pt-[0.5rem]";
+    "mb-[1rem] ml-[4.8rem] mr-[2.36rem] mt-[0.6rem] flex h-[34.8rem] flex-col gap-[1.1rem] overflow-y-auto border-l border-white/40 pl-[1.2rem] pt-[0.4rem]";
 
 // How many line numbers the fake "editor" shows (extra ones are clipped).
 const LINE_COUNT = 60;
@@ -63,6 +64,12 @@ const CHEVRON_DOWN = `
   <svg class="h-[1.09rem] w-[2.07rem] shrink-0" viewBox="0 0 33 17" fill="none"
        stroke="currentColor" stroke-width="2" aria-hidden="true">
     <path d="M1 1 L16.5 15.5 L32 1" />
+  </svg>`;
+
+const CHEVRON_RIGHT = `
+  <svg class="h-[1.35rem] w-[0.8rem] shrink-0 text-white/80" viewBox="0 0 12 20" fill="none"
+       stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+    <path d="M2 2 L10 10 L2 18" />
   </svg>`;
 
 const ICON_FILES = `
@@ -218,9 +225,28 @@ function terminal() {
   </section>`;
 }
 
+/**
+ * Format a player's name by appending the file extension associated
+ * with their selected programming language.
+ *
+ * @param {string} playerName 
+ * @param {string | undefined} language 
+ * @returns {string} The formatted player name (e.g. Anson.py)
+ */
+function formatPlayerName(playerName, language) {
+    if (!language) {
+        return playerName;
+    }
+
+    const langData = LANGUAGE_EXTENSIONS[language.toLowerCase()];
+    if (!langData) {
+      return playerName;
+    }
+
+    return `${playerName}${langData.ext}`;
+}
+
 // ---------- public function ----------
-
-
 /**
  * Sets the room code displayed in the container.
  *
@@ -239,7 +265,7 @@ export function setRoomCode(container, roomCode) {
  * Renders the players in the lobby and updates player count
  *
  * @param {Element} container - container element containing player list
- * @param {{ playerId: string, playerName: string, role: string }[]} players - players to render
+ * @param {{ playerId: string, playerName: string, role: string, language?: string }[]} players - players to render
  * @param {number} [maxPlayers] - room capacity from the server
  */
 export function renderPlayers(container, players, maxPlayers) {
@@ -274,18 +300,32 @@ export function renderPlayers(container, players, maxPlayers) {
 
     for (let i = 0; i < list.length; i++) {
         const player = list[i];
+        const hasLanguage = Boolean(player.language);
+        const lang = typeof player.language === "string" ? player.language.toLowerCase() : "";
 
         const row = document.createElement("div");
-        row.className =
-          "flex items-center justify-between gap-[0.8rem] rounded-[0.25rem] bg-[#181818] px-[1.2rem] py-[0.65rem]";
+        row.className = "flex items-center justify-between gap-[0.8rem] py-[0.2rem]";
 
         const left = document.createElement("div");
         left.className = "flex min-w-0 items-center gap-[0.8rem]";
-        left.innerHTML = ICON_PLAYER;
+
+        const langData = LANGUAGE_EXTENSIONS[lang];
+        left.innerHTML = CHEVRON_RIGHT;
+
+        // ">" chevron + icon
+        if(langData) {
+            const img = document.createElement("img");
+            img.src = langData.url;
+            img.alt = lang;
+            img.className = "size-[1.8rem] shrink-0 object-contain";
+            left.appendChild(img);
+        } else {
+            left.innerHTML += ICON_PLAYER;
+        }
 
         const name = document.createElement("span");
         name.className = "tb-font-jersey10 truncate text-[2rem] leading-none text-white";
-        name.textContent = player.playerName; // textContent is safe against weird nicknames
+        name.textContent = formatPlayerName(player.playerName, player.language); 
         left.appendChild(name);
 
         if (player.role === "lobby_host") {
@@ -296,9 +336,15 @@ export function renderPlayers(container, players, maxPlayers) {
           left.appendChild(hostTag);
         }
 
+        // Yellow = hasnt chosen a language yet; Green = language chosen
         const statusDot = document.createElement("span");
-        statusDot.className = "size-[0.75rem] shrink-0 rounded-full bg-[#4ade80]";
-        statusDot.title = "Connected";
+        if(hasLanguage) {
+            statusDot.className = "size-[0.75rem] shrink-0 rounded-full bg-[#4ade80]";
+            statusDot.title = "Ready";
+        } else {
+            statusDot.className = "size-[0.75rem] shrink-0 rounded-full bg-[#facc15]";
+            statusDot.title = "Choosing language...";
+        }
 
         row.appendChild(left);
         row.appendChild(statusDot);
