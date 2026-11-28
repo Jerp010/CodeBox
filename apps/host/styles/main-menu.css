@@ -17,25 +17,18 @@
   font-style: normal;
 }
 
-/* =========================================
+/* ========================================
    FOLDER STACK
-========================================= */
+======================================== */
 
 .folder-card {
   position: absolute;
   width: min(1100px, 95vw);
   aspect-ratio: 932 / 836;
   left: 50%;
-  transition: translate 0.3s ease-in-out;
 }
 
-.folder-card img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-
-/* BACK TO FRONT */
+/* Original folder positions */
 
 .folder-trv {
   top: 230px;
@@ -73,20 +66,83 @@
   z-index: 6;
 }
 
-/* SELECTED FOLDER */
 
-.folder-card.selected .folder-unselected {
+/* ========================================
+   FOLDER BUTTON
+======================================== */
+
+.folder-trigger {
+  position: absolute;
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  padding: 0;
+  border: none;
+  background: transparent;
+
+  cursor: pointer;
+
+  transform: translateY(0);
+  transition: transform 0.3s ease-in-out;
+}
+
+
+/* ========================================
+   FOLDER IMAGES
+======================================== */
+
+.folder-trigger img {
+  position: absolute;
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.folder-card[data-mode] .folder-selected {
   display: none;
 }
 
-.folder-card.selected .folder-selected {
+.folder-card[data-mode]:hover .folder-unselected,
+.folder-card[data-mode]:focus-within .folder-unselected {
+  display: none;
+}
+
+.folder-card[data-mode]:hover .folder-selected,
+.folder-card[data-mode]:focus-within .folder-selected {
   display: block;
 }
 
-.folder-card.selected {
-  translate: 0 -330px;
+
+/* ========================================
+   FOLDER HOVER ANIMATION
+======================================== */
+
+.folder-card[data-mode]:hover .folder-trigger,
+.folder-card[data-mode]:focus-within .folder-trigger {
+  transform: translateY(-330px);
 }
 
+
+/* ========================================
+   FOLDER INTERACTION
+======================================== */
+
+.folder-trigger:focus-visible {
+  outline: 3px solid #753FEB;
+  outline-offset: 4px;
+  border-radius: 12px;
+}
+
+.folder-trigger:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
 
 /* GAME BACKGROUND */
 #scene-background {

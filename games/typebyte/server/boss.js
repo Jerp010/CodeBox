@@ -1,6 +1,15 @@
 // @ts-check
 const { difficultyForBoss } = require('./challenges');
-const { BOSSES, BOSS_HEALTH_PER_PLAYER, MIN_PLAYER_COUNT, MAX_PLAYER_COUNT } = require('./constants');
+const { 
+    BOSSES, 
+    BOSS_HEALTH_PER_PLAYER, 
+    MIN_PLAYER_COUNT, 
+    MAX_PLAYER_COUNT,
+    BOSS_ATTACK_DAMAGE
+} = require('./constants');
+const { damagePlayer } = require('./player');
+
+/** @typedef {import('./player').Player} Player */
 
 /**
  * @typedef {Object}   Boss
@@ -73,4 +82,44 @@ function hasNextBoss(bossIndex) {
     return bossIndex + 1 < BOSSES.length;
 }
 
-module.exports = { createBoss, damageBoss, hasNextBoss, MIN_PLAYER_COUNT };
+/**
+ * @typedef {Object}   AttackResult
+ * @property {boolean} attacked - false if the attack was skipped
+ * @property {string}  playerId - the player the attack was aimed at
+ * @property {number}  damage   - health the player actually lost (0 skipped)
+ * @property {number}  health   - player's health after attack
+ * @property {boolean} defeated - true if player is defeated after attack
+ */
+
+/**
+ * The boss counterattacks a player after wrong submission. 
+ * Call this once per wrong submission, not per keystroke. 
+ *
+ * @param {Boss} boss 
+ * @param {Player} player  - player who submitted wrong syntax
+ * @returns {AttackResult} what happened, so the server can tell the client
+ */
+function bossAttack(boss, player) {
+    if(boss.defeated || player.defeated) {
+        return {
+            attacked: false,
+            playerId: player.id,
+            damage:   0,
+            health:   player.health,
+            defeated: player.defeated,
+        };
+    }
+
+    const healthBefore = player.health;
+    damagePlayer(player, BOSS_ATTACK_DAMAGE);
+
+    return {
+        attacked: true,
+        playerId: player.id,
+        damage:   healthBefore - player.health,
+        health:   player.health,
+        defeated: player.defeated,
+    };
+}
+
+module.exports = { createBoss, damageBoss, hasNextBoss, bossAttack, MIN_PLAYER_COUNT };
