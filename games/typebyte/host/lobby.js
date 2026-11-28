@@ -1,6 +1,6 @@
 // @ts-check
 
-import { LANGUAGE_EXTENSIONS } from "../shared/languages.js";
+import { LANGUAGE_EXTENSIONS, formatPlayerName } from "../shared/languages.js";
 import "./lobby.css";
 
 // TODO(room-code): replace this static value with the real room code
@@ -223,27 +223,6 @@ function terminal() {
       <span>${PS_PATH}</span>
     </div>
   </section>`;
-}
-
-/**
- * Format a player's name by appending the file extension associated
- * with their selected programming language.
- *
- * @param {string} playerName 
- * @param {string | undefined} language 
- * @returns {string} The formatted player name (e.g. Anson.py)
- */
-function formatPlayerName(playerName, language) {
-    if (!language) {
-        return playerName;
-    }
-
-    const langData = LANGUAGE_EXTENSIONS[language.toLowerCase()];
-    if (!langData) {
-      return playerName;
-    }
-
-    return `${playerName}${langData.ext}`;
 }
 
 // ---------- public function ----------
