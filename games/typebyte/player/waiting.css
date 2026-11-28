@@ -1,0 +1,203 @@
+@import url("https://fonts.googleapis.com/css2?family=Cascadia+Mono:wght@400&display=swap");
+
+#waiting-typbyt[hidden],
+.page-wrapper[hidden] {
+  display: none;
+}
+
+body:has(#typebyte-waiting) {
+  background-color: #303030;
+}
+
+#typebyte-waiting {
+  min-height: 100dvh;
+  width: 100%;
+  padding-top: 7px;
+  background-color: #303030;
+  color: #ffffff;
+  font-family: "Cascadia Mono", "Cascadia Code", Consolas, "DejaVu Sans Mono", monospace;
+  box-sizing: border-box;
+}
+
+#typebyte-waiting *,
+#typebyte-waiting *::before,
+#typebyte-waiting *::after {
+    box-sizing: border-box;
+}
+
+/* 
+ * ==============================
+ *      Top player name bar 
+ * ==============================
+ */
+#typebyte-waiting .tb-wait-header {
+    width: 100%;
+    height: 42px;
+    padding: 0 16px;
+    background-color: #303030;
+    border-top: 1px solid #ffffff;
+    border-bottom: 1px solid #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+#typebyte-waiting .tb-wait-header-icon {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+#typebyte-waiting .tb-wait-header-icon[hidden] {
+    display: none;
+}
+
+#typebyte-waiting .tb-wait-player-name {
+    margin: 1;
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 1.5;
+    letter-spacing: -0.25px;
+    color: #ffffff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* 
+ * ==============================
+ *      Main waiting content
+ * ==============================
+ */
+#typebyte-waiting .tb-wait-body {
+    width: 100%;
+    max-width: 360px;
+    margin: 0 auto;
+    padding-top: 27px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#typebyte-waiting .tb-wait-prompt {
+    margin: 0;
+    padding: 0 16px;
+    font-size: 13px;
+    font-weight: 400;
+    line-height: normal;
+    color: #ffffff;
+    text-align: center;
+}
+/* 
+ * ====================================
+ *     Host-only "start" command box
+ * ====================================
+ */
+#typebyte-waiting .tb-wait-start-form {
+    width: 296px;
+    max-width: calc(100% - 64px);
+    margin-top: 18px;
+}
+
+#typebyte-waiting .tb-wait-start-input {
+    width: 100%;
+    height: 35px;
+    padding: 0 20px;
+    border: none;
+    border-radius: 0;
+    outline: none;
+    background-color: #ffffff;
+    color: #000000;
+    font-family: inherit;
+    font-size: 17px;
+    font-weight: 400;
+    line-height: normal;
+    letter-spacing: -0.2px;
+}
+
+#typebyte-waiting .tb-wait-start-input::placeholder {
+    color: #8c8c8c;
+}
+
+#typebyte-waiting .tb-wait-start-input:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+#typebyte-waiting .tb-wait-start-input:focus-visible {
+    outline: 2px solid #0bd046;
+    outline-offset: 2px;
+}
+
+/* 
+ * ==============================
+ *     Language icon row
+ * ==============================
+ */
+#typebyte-waiting .tb-wait-languages {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 26px;
+    margin-top: 26px;
+    padding: 0 16px;
+}
+
+#typebyte-waiting .tb-wait-lang-btn {
+    width: 55px;
+    height: 55px;
+    padding: 0;
+    display: grid;
+    place-items: center;
+    background-color: transparent;
+    border: 1px solid #ffffff;
+    border-radius: 0;
+    cursor: pointer;
+    transition: border-color 0.15s ease, transform 0.1s ease;
+}
+
+#typebyte-waiting .tb-wait-lang-btn:active {
+    transform: scale(0.96);
+}
+
+#typebyte-waiting .tb-wait-lang-btn.is-selected {
+    border-color: #0bd046;
+}
+
+#typebyte-waiting .tb-wait-lang-btn:focus-visible {
+    outline: 2px solid #0bd046;
+    outline-offset: 2px;
+}
+
+#typebyte-waiting .tb-wait-lang-icon {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+    pointer-events: none;
+}
+
+/* 
+ * ==============================
+ *     Status feedback line
+ * ==============================
+ */
+#typebyte-waiting .tb-wait-status {
+    margin: 18px 0 0;
+    padding: 0 20px;
+    min-height: 18px;
+    font-size: 13px;
+    line-height: 1.4;
+    color: #b5b5b5;
+    text-align: center;
+}
+
+#typebyte-waiting .tb-wait-status.is-ready {
+    color: #0bd046;
+}
+
+#typebyte-waiting .tb-wait-status.is-error {
+    color: #f87171;
+}
