@@ -55,7 +55,7 @@ body:has(#typebyte-waiting) {
 }
 
 #typebyte-waiting .tb-wait-player-name {
-    margin: 1;
+    margin: 0;
     font-size: 18px;
     font-weight: 400;
     line-height: 1.5;
