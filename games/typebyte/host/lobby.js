@@ -1,15 +1,16 @@
-// TypeByte lobby screen (UI only, no game logic yet).
-// Built from the Figma frame "Typebyte Lobby" (node 68:2).
-//
-// Usage from the host app:
-//   import { mountLobby } from "./lobby.js";
-//   mountLobby(document.querySelector("#app"));
+// @ts-check
 
 import "./lobby.css";
 
 // TODO(room-code): replace this static value with the real room code
 // that the server generates when the host creates a room.
 const ROOM_CODE = "A12SAC";
+
+const PLAYERS_EMPTY_CLASS =
+    "mb-[1rem] ml-[3.7rem] mr-[2.36rem] mt-[0.5rem] grid h-[34.8rem] place-items-center rounded-[0.25rem] border border-dashed border-white/25";
+
+const PLAYERS_LIST_CLASS =
+    "mb-[1rem] ml-[3.7rem] mr-[2.36rem] mt-[0.5rem] flex h-[34.8rem] flex-col gap-[0.75rem] overflow-y-auto pt-[0.5rem]";
 
 // How many line numbers the fake "editor" shows (extra ones are clipped).
 const LINE_COUNT = 60;
@@ -92,6 +93,13 @@ const ICON_INFO = `
     <path d="M8 7 V11.5" /><circle cx="8" cy="4.8" r="0.4" />
   </svg>`;
 
+const ICON_PLAYER = `
+  <svg class="size-[1.5rem] shrink-0 text-[#4d7cff]" viewBox="0 0 24 24" fill="none"
+       stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M14 2 H6 A2 2 0 0 0 4 4 V20 A2 2 0 0 0 6 22 H18 A2 2 0 0 0 20 20 V8 Z" />
+    <path d="M14 2 V8 H20" />
+  </svg>`;
+
 // ---------- the screen, split into its 4 regions ----------
 
 function menuBar() {
@@ -134,17 +142,10 @@ function sidebar() {
         ${CHEVRON_DOWN}<span>TypeByte.md</span>
       </div>
       <div class="tb-font-jersey10 mt-[1.35rem] flex h-[2.53rem] items-center gap-[1.43rem] pl-[3.8rem] text-[2.25rem]">
-        ${CHEVRON_DOWN}<span>Players</span>
+        ${CHEVRON_DOWN}<span>Players</span><span id="players-count" class="text-[1.75rem] text-white/50"></span>
       </div>
 
-      <!-- TODO(players): PLAYERS BOX.
-           This empty box is the placeholder for the player list.
-           Later: fill #players-list with one row per player
-           (language icon + "name.ext" + green/yellow status dot).
-           Remove the dashed border and the hint text when real rows go in. -->
-      <div id="players-list"
-        class="mb-[1rem] ml-[3.7rem] mr-[2.36rem] mt-[0.5rem] grid h-[34.8rem] place-items-center rounded-[0.25rem] border border-dashed border-white/25">
-        <span class="tb-font-jersey10 text-[1.75rem] text-white/30">Players will appear here</span>
+      <div id="players-list" class="${PLAYERS_EMPTY_CLASS}">
       </div>
     </section>
   </aside>`;
@@ -205,10 +206,6 @@ function terminal() {
     <div class="ml-[1.2rem] mt-[0.3rem]">[ System ] TypeByte initialized.</div>
     <div class="ml-[1.2rem]">[ System ] Room created.</div>
 
-    <!-- TODO(room-code): ROOM CODE text.
-         #room-code is the element to update when the server sends the real
-         code (e.g. document.querySelector("#room-code").textContent = code).
-         The link and QR code for players can go next to it later. -->
     <div class="ml-[0.97rem] mt-[0.78rem]">
       <div class="text-[2.25rem] leading-[2.33rem] text-[#686868]">ROOM CODE</div>
       <div id="room-code" class="-mt-[0.25rem] text-[4rem] leading-[4.15rem]">${ROOM_CODE}</div>
@@ -223,7 +220,99 @@ function terminal() {
 
 // ---------- public function ----------
 
-export function mountLobby(container) {
+
+/**
+ * Sets the room code displayed in the container.
+ *
+ * @param {Element} container - container elemnt that contains the room code
+ * @param {string} roomCode - room code to display
+ */
+export function setRoomCode(container, roomCode) {
+    const roomCodeElement = container.querySelector("#room-code");
+
+    if(roomCodeElement){
+        roomCodeElement.textContent = roomCode;
+    }
+}
+
+/**
+ * Renders the players in the lobby and updates player count
+ *
+ * @param {Element} container - container element containing player list
+ * @param {{ playerId: string, playerName: string, role: string }[]} players - players to render
+ * @param {number} [maxPlayers] - room capacity from the server
+ */
+export function renderPlayers(container, players, maxPlayers) {
+    const playersList = container.querySelector("#players-list");
+    if(!playersList) {
+        return;
+    }
+
+    const playerCount = container.querySelector("#players-count");
+    const list = Array.isArray(players) ? players : [];
+
+    if(playerCount) {
+        playerCount.textContent = Number.isInteger(maxPlayers) 
+            ? `(${list.length}/${maxPlayers})`
+            : "";
+    }
+
+    playersList.innerHTML = ""; // clear old rows before redrawing
+
+    // if nobody joined yet, show the placeholder box
+    if(list.length === 0) {
+        playersList.className = PLAYERS_EMPTY_CLASS;
+        const emptyHint = document.createElement("span");
+        emptyHint.className = "tb-font-jersey10 text-[1.75rem] text-white/30";
+        emptyHint.textContent = "Players will appear here";
+        playersList.appendChild(emptyHint);
+        return;
+    }
+
+    // Switch to vertical list styling and build one row per player
+    playersList.className = PLAYERS_LIST_CLASS;
+
+    for (let i = 0; i < list.length; i++) {
+        const player = list[i];
+
+        const row = document.createElement("div");
+        row.className =
+          "flex items-center justify-between gap-[0.8rem] rounded-[0.25rem] bg-[#181818] px-[1.2rem] py-[0.65rem]";
+
+        const left = document.createElement("div");
+        left.className = "flex min-w-0 items-center gap-[0.8rem]";
+        left.innerHTML = ICON_PLAYER;
+
+        const name = document.createElement("span");
+        name.className = "tb-font-jersey10 truncate text-[2rem] leading-none text-white";
+        name.textContent = player.playerName; // textContent is safe against weird nicknames
+        left.appendChild(name);
+
+        if (player.role === "lobby_host") {
+          const hostTag = document.createElement("span");
+          hostTag.className =
+            "tb-font-jersey25 shrink-0 rounded-[0.19rem] bg-[#325ff1]/25 px-[0.45rem] py-[0.15rem] text-[0.95rem] leading-none text-[#7aa2ff]";
+          hostTag.textContent = "HOST";
+          left.appendChild(hostTag);
+        }
+
+        const statusDot = document.createElement("span");
+        statusDot.className = "size-[0.75rem] shrink-0 rounded-full bg-[#4ade80]";
+        statusDot.title = "Connected";
+
+        row.appendChild(left);
+        row.appendChild(statusDot);
+        playersList.appendChild(row);
+    }
+}
+
+/**
+ * Mounts lobby UI inside the specified container.
+ *
+ * @param {Element} container - the container element where the lobby will be rendered.
+ * @param {string} [roomCode]
+ */
+export function mountLobby(container, roomCode = ROOM_CODE) {
   container.innerHTML = `
   <div id="typebyte-lobby"
        class="flex h-screen w-screen min-w-[1024px] flex-col overflow-hidden bg-[#2f2f2f] text-white">
@@ -236,4 +325,5 @@ export function mountLobby(container) {
       </main>
     </div>
   </div>`;
+  setRoomCode(container, roomCode);
 }
